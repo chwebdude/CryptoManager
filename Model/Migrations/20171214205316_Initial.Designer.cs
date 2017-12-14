@@ -4,14 +4,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
+using Model.Enums;
 using System;
 
-namespace CryptoManager.Migrations
+namespace Model.Migrations
 {
     [DbContext(typeof(CryptoContext))]
-    [Migration("20171212162138_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20171214205316_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -19,14 +21,25 @@ namespace CryptoManager.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.0.1-rtm-125");
 
-            modelBuilder.Entity("CryptoManager.Models.DataModel.CryptoTransaction", b =>
+            modelBuilder.Entity("Model.DbModels.CryptoTransaction", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.HasKey("Id");
 
-                    b.ToTable("CryptoTransactions");
+                    b.ToTable("Transactions");
+                });
+
+            modelBuilder.Entity("Model.DbModels.Setting", b =>
+                {
+                    b.Property<int>("Key");
+
+                    b.Property<string>("Value");
+
+                    b.HasKey("Key");
+
+                    b.ToTable("Settings");
                 });
 #pragma warning restore 612, 618
         }
