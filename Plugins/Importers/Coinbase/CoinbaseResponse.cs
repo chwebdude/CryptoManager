@@ -33,7 +33,7 @@ namespace Plugins.Importers.Coinbase
 
     internal class CoinbaseBalance
     {
-        internal float Amount { get; set; }
+        internal decimal Amount { get; set; }
         internal string Currency { get; set; }
     }
     internal class CoinbaseCurrency
