@@ -33,15 +33,19 @@ namespace Model.Migrations
 
                     b.Property<DateTime>("DateTime");
 
-                    b.Property<Guid?>("ExchangeId");
+                    b.Property<Guid>("ExchangeId");
 
                     b.Property<decimal>("FeeAmount");
 
                     b.Property<string>("FeeCurrency");
 
+                    b.Property<string>("InAdress");
+
                     b.Property<decimal>("InAmount");
 
                     b.Property<string>("InCurrency");
+
+                    b.Property<string>("OutAdress");
 
                     b.Property<decimal>("OutAmount");
 
@@ -57,29 +61,7 @@ namespace Model.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ExchangeId");
-
                     b.ToTable("Transactions");
-                });
-
-            modelBuilder.Entity("Model.DbModels.Exchange", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Name");
-
-                    b.Property<string>("PrivateKey");
-
-                    b.Property<string>("PublicKey");
-
-                    b.Property<bool>("SupportsPrivateKey");
-
-                    b.Property<bool>("SupportsPublicKey");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Exchange");
                 });
 
             modelBuilder.Entity("Model.DbModels.Setting", b =>
@@ -91,13 +73,6 @@ namespace Model.Migrations
                     b.HasKey("Key");
 
                     b.ToTable("Settings");
-                });
-
-            modelBuilder.Entity("Model.DbModels.CryptoTransaction", b =>
-                {
-                    b.HasOne("Model.DbModels.Exchange", "Exchange")
-                        .WithMany()
-                        .HasForeignKey("ExchangeId");
                 });
 #pragma warning restore 612, 618
         }

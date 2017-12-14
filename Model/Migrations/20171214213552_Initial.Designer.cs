@@ -12,7 +12,7 @@ using System;
 namespace Model.Migrations
 {
     [DbContext(typeof(CryptoContext))]
-    [Migration("20171214205316_Initial")]
+    [Migration("20171214213552_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,6 +25,40 @@ namespace Model.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<decimal>("BuyAmount");
+
+                    b.Property<string>("BuyCurrency");
+
+                    b.Property<string>("Comment");
+
+                    b.Property<DateTime>("DateTime");
+
+                    b.Property<Guid>("ExchangeId");
+
+                    b.Property<decimal>("FeeAmount");
+
+                    b.Property<string>("FeeCurrency");
+
+                    b.Property<string>("InAdress");
+
+                    b.Property<decimal>("InAmount");
+
+                    b.Property<string>("InCurrency");
+
+                    b.Property<string>("OutAdress");
+
+                    b.Property<decimal>("OutAmount");
+
+                    b.Property<string>("OutCurrency");
+
+                    b.Property<decimal>("SellAmount");
+
+                    b.Property<string>("SellCurrency");
+
+                    b.Property<string>("TransactionKey");
+
+                    b.Property<int>("Type");
 
                     b.HasKey("Id");
 

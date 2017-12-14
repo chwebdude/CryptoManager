@@ -14,10 +14,11 @@ namespace Model.DbModels
 
         public decimal InAmount { get; set; }
         public string InCurrency { get; set; }
+        public string InAdress { get; set; }
 
         public decimal OutAmount { get; set; }
         public string OutCurrency { get; set; }
-
+        public string OutAdress { get; set; }
         
         public decimal FeeAmount { get; set; }
         public string FeeCurrency{ get; set; }
@@ -29,7 +30,7 @@ namespace Model.DbModels
         public string SellCurrency { get; set; }
 
 
-        public Exchange Exchange { get; set; }
+        public Guid ExchangeId { get; set; }
         public string Comment { get; set; }
         public string TransactionKey { get; set; }
     }
