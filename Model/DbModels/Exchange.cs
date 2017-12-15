@@ -10,12 +10,9 @@ namespace Model.DbModels
         [Key]
         public Guid Id { get; set; }
 
-        public string Name { get; set; }
-
-        public bool SupportsPublicKey { get; set; }
+        public string Comment { get; set; }
         public string PublicKey { get; set; }
 
-        public bool SupportsPrivateKey { get; set; }
         public string PrivateKey { get; set; }
     }
 }

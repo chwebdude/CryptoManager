@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Model.DbModels;
+using Model.Meta;
 using Newtonsoft.Json;
 using NLog;
 using RestSharp;
@@ -41,6 +42,17 @@ namespace Plugins.Importers.Coinbase
             }
 
             return cryptoTransactions;
+        }
+
+        public ExchangeMeta GetExchangeMeta()
+        {
+            return new ExchangeMeta()
+            {
+                ExchangeId = Model.Enums.Exchange.Coinbase,
+                Name = "Coinbase",
+                LabelPrivateKey = "Private Key",
+                LabelPublicKey = "Public Key"                
+            };
         }
 
         private CryptoTransaction MappTransaction(CoinbaseTransaction transaction)

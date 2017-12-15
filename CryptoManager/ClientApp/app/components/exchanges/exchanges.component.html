@@ -1,3 +1,4 @@
 <h1>Exchanges</h1>
-<p-dropdown [options]="cities1" [(ngModel)]="selectedCity1"></p-dropdown>
-<i class="fa fa-exchange" aria-hidden="true"></i>
+<h2>Add importer</h2>
+<p-dropdown [options]="availableExchanges" [(ngModel)]="selectedAvailableExchange"></p-dropdown>
+<p *ngIf="selectedAvailableExchange != null">Edit</p>
