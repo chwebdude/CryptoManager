@@ -1,6 +1,10 @@
 import 'reflect-metadata';
 import 'zone.js';
 import 'rxjs/add/operator/first';
+
+import 'primeng/primeng';
+
+
 import { APP_BASE_HREF } from '@angular/common';
 import { enableProdMode, ApplicationRef, NgZone, ValueProvider } from '@angular/core';
 import { platformDynamicServer, PlatformState, INITIAL_CONFIG } from '@angular/platform-server';

@@ -16,11 +16,37 @@ module.exports = (env) => {
             publicPath: 'dist/' // Webpack dev middleware, if enabled, handles requests for this URL prefix
         },
         module: {
-            rules: [
-                { test: /\.ts$/, use: isDevBuild ? ['awesome-typescript-loader?silent=true', 'angular2-template-loader', 'angular2-router-loader'] : '@ngtools/webpack' },
-                { test: /\.html$/, use: 'html-loader?minimize=false' },
-                { test: /\.css$/, use: [ 'to-string-loader', isDevBuild ? 'css-loader' : 'css-loader?minimize' ] },
-                { test: /\.(png|jpg|jpeg|gif|svg)$/, use: 'url-loader?limit=25000' }
+          rules: [
+            {
+              test: /\.ts$/,
+              include: [/ClientApp/, /DebugBoot/],
+              use: isDevBuild ? ['ts-loader', 'angular2-template-loader'] : '@ngtools/webpack'
+            },
+            { test: /\.html$/, use: 'html-loader?minimize=false' },
+            { test: /\.(png|jpg|jpeg|gif|svg)$/, use: 'url-loader?limit=25000' },
+
+            // Fonts
+            {
+              test: /\.(ttf|otf|eot|svg|woff(2)?)(\?[a-z0-9]+)?$/,
+              loader: 'file-loader?name=fonts/[name].[ext]'
+            },
+
+            {
+              test: /\.(css|scss)$/,
+              use: [
+                {
+                  loader: 'css-to-string-loader' // creates style nodes from JS strings
+                }, {
+                  loader: "css-loader" // translates CSS into CommonJS
+                }, {
+                  loader: "sass-loader" // compiles Sass to CSS
+                }
+              ]
+            },
+            {
+              test: /\.json/,
+              loader: "json-loader"
+            }
             ]
         },
         plugins: [new CheckerPlugin()]
@@ -29,7 +55,12 @@ module.exports = (env) => {
     // Configuration for client-side bundle suitable for running in browsers
     const clientBundleOutputDir = './wwwroot/dist';
     const clientBundleConfig = merge(sharedConfig, {
-        entry: { 'main-client': './ClientApp/boot.browser.ts' },
+        //entry: { 'main-client': './ClientApp/boot.browser.ts' },
+      entry: {
+        'styles': './ClientApp/main.scss',
+        'polyfills': './ClientApp/polyfills.ts',
+        'main-client': './ClientApp/boot.browser.ts'
+      },
         output: { path: path.join(__dirname, clientBundleOutputDir) },
         plugins: [
             new webpack.DllReferencePlugin({

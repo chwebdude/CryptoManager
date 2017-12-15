@@ -4,6 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
 
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { DropdownModule } from 'primeng/primeng';     
+
+
 import { AppComponent } from './components/app/app.component';
 import { NavMenuComponent } from './components/navmenu/navmenu.component';
 import { HomeComponent } from './components/home/home.component';
@@ -23,7 +28,12 @@ import { ExchangesComponent } from './components/exchanges/exchanges.component';
     imports: [
         CommonModule,
         HttpModule,
-        FormsModule,
+      FormsModule,
+
+      DropdownModule,
+      BrowserModule,
+      BrowserAnimationsModule,
+
         RouterModule.forRoot([
             { path: '', redirectTo: 'home', pathMatch: 'full' },
             { path: 'home', component: HomeComponent },
