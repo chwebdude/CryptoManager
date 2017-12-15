@@ -12,7 +12,10 @@ const treeShakableModules = [
     '@angular/platform-browser',
     '@angular/platform-browser-dynamic',
     '@angular/router',
-    'zone.js',
+  'zone.js',
+  'primeng/primeng',
+  'primeng/resources/primeng.min.css',
+  'primeng/resources/themes/omega/theme.css'
 ];
 const nonTreeShakableModules = [
     'bootstrap',
@@ -32,7 +35,7 @@ module.exports = (env) => {
         resolve: { extensions: [ '.js' ] },
         module: {
             rules: [
-                { test: /\.(png|woff|woff2|eot|ttf|svg)(\?|$)/, use: 'url-loader?limit=100000' }
+              { test: /\.(png|woff|woff2|eot|ttf|svg|png|jpg|jpeg|gif)(\?|$)/, use: 'url-loader?limit=100000' }
             ]
         },
         output: {
@@ -41,10 +44,19 @@ module.exports = (env) => {
             library: '[name]_[hash]'
         },
         plugins: [
-            new webpack.ProvidePlugin({ $: 'jquery', jQuery: 'jquery' }), // Maps these identifiers to the jQuery package (because Bootstrap expects it to be a global variable)
-            new webpack.ContextReplacementPlugin(/\@angular\b.*\b(bundles|linker)/, path.join(__dirname, './ClientApp')), // Workaround for https://github.com/angular/angular/issues/11580
-            new webpack.ContextReplacementPlugin(/angular(\\|\/)core(\\|\/)@angular/, path.join(__dirname, './ClientApp')), // Workaround for https://github.com/angular/angular/issues/14898
-            new webpack.IgnorePlugin(/^vertx$/) // Workaround for https://github.com/stefanpenner/es6-promise/issues/100
+          new webpack.ProvidePlugin({ $: 'jquery', jQuery: 'jquery' }), // Maps these identifiers to the jQuery package (because Bootstrap expects it to be a global variable)
+
+          // The following two lines were replaced with the new ContextReplacementPlugin with the Angular 5 upgrade
+          //new webpack.ContextReplacementPlugin(/\@angular\b.*\b(bundles|linker)/, path.join(__dirname, './ClientApp')), // Workaround for https://github.com/angular/angular/issues/11580
+          //new webpack.ContextReplacementPlugin(/angular(\\|\/)core(\\|\/)@angular/, path.join(__dirname, './ClientApp')), // Workaround for https://github.com/angular/angular/issues/14898
+
+          new webpack.ContextReplacementPlugin(
+            // The (\\|\/) piece accounts for path separators in *nix and Windows
+            /angular(\\|\/)core/,
+            path.join(__dirname, './ClientApp'), // location of your src
+            {}
+          ),
+          new webpack.IgnorePlugin(/^vertx$/) // Workaround for https://github.com/stefanpenner/es6-promise/issues/100
         ]
     };
 
