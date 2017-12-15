@@ -1,4 +1,26 @@
 <h1>Exchanges</h1>
 <h2>Add importer</h2>
 <p-dropdown [options]="availableExchanges" [(ngModel)]="selectedAvailableExchange"></p-dropdown>
-<p *ngIf="selectedAvailableExchange != null">Edit</p>
+<div *ngIf="selectedAvailableExchange != null">
+    
+    <div class="panel panel-default">
+        <div class="panel-heading">{{selectedAvailableExchange.name}}</div>
+        <div class="panel-body">
+            
+            <div class="form-group">
+                <label for="exampleInputEmail1">API Key</label>
+                <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
+            </div>
+            
+            <div class="form-group">
+                <label for="exampleInputEmail1">Private Key</label>
+                <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
+            </div>
+
+            <button type="button" class="btn btn-primary">Add</button>
+
+
+        </div>
+    </div>    
+</div>
+
