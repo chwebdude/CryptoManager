@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace CryptoManager
 {
@@ -27,6 +28,14 @@ namespace CryptoManager
             services.AddMvc();
             var connection = "Data Source = crypto.db";
             services.AddDbContext<CryptoContext>(options => options.UseSqlite(connection));
+
+            // Add some Swag
+            services.AddSwaggerGen(c =>
+                c.SwaggerDoc("v1", new Info()
+                {
+                    Title = "Crypto Manager API",
+                    Version = "v1"
+                }));
 
         }
 
@@ -47,6 +56,16 @@ namespace CryptoManager
             }
 
             app.UseStaticFiles();
+
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Crypto Manager API");
+            });
+
 
             app.UseMvc(routes =>
             {
