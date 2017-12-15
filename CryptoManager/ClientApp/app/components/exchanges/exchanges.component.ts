@@ -1,9 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { DropdownModule, SelectItem } from 'primeng/primeng';
-
-import '../../../../node_modules/primeng/resources/themes/omega/theme.css';
-import '../../../../node_modules/primeng/resources/primeng.min.css';
-import '../../../../node_modules/font-awesome/css/font-awesome.min.css';
+import { SelectItem } from 'primeng/primeng';
+import { CryptoApiClient, IExchangeMeta } from '../../services/api-client';
 
 interface City {
   name: string;
@@ -16,21 +13,20 @@ interface City {
   styleUrls: ['./exchanges.component.css']
 })
 export class ExchangesComponent implements OnInit {
+  availableExchanges: SelectItem[] = [{ label: 'Select Exchange Plugin', value: null }];
+  selectedAvailableExchange: IExchangeMeta;
 
-  cities1: SelectItem[];
-  selectedCity1: City;
+  constructor(private apiClient: CryptoApiClient) {
 
+    apiClient.apiExchangesAvailableExchangesGet().subscribe(ex => {
+      for (let entry of ex) {
+        this.availableExchanges.push({
+          label: <string>entry.name,
+          value: entry
+        });
+      }
+    });
 
-  constructor() {
-
-    this.cities1 = [
-      { label: 'Select City', value: null },
-      { label: 'New York', value: { id: 1, name: 'New York', code: 'NY' } },
-      { label: 'Rome', value: { id: 2, name: 'Rome', code: 'RM' } },
-      { label: 'London', value: { id: 3, name: 'London', code: 'LDN' } },
-      { label: 'Istanbul', value: { id: 4, name: 'Istanbul', code: 'IST' } },
-      { label: 'Paris', value: { id: 5, name: 'Paris', code: 'PRS' } }
-    ];
 
   }
 

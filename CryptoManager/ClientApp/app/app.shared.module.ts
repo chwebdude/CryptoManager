@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
+import { HttpClientModule } from '@angular/common/http';
 
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -15,6 +16,8 @@ import { HomeComponent } from './components/home/home.component';
 import { FetchDataComponent } from './components/fetchdata/fetchdata.component';
 import { CounterComponent } from './components/counter/counter.component';
 import { ExchangesComponent } from './components/exchanges/exchanges.component';
+
+import { CryptoApiClient } from './services/api-client';
 
 @NgModule({
     declarations: [
@@ -33,6 +36,7 @@ import { ExchangesComponent } from './components/exchanges/exchanges.component';
       DropdownModule,
       BrowserModule,
       BrowserAnimationsModule,
+      HttpClientModule,
 
         RouterModule.forRoot([
             { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -42,6 +46,9 @@ import { ExchangesComponent } from './components/exchanges/exchanges.component';
             { path: 'exchanges', component: ExchangesComponent },
             { path: '**', redirectTo: 'home' }
         ])
+    ],
+    providers: [
+      CryptoApiClient
     ]
 })
 export class AppModuleShared {
