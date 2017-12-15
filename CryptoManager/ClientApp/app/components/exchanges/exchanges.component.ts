@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { SelectItem } from 'primeng/primeng';
+import { SelectItem, ButtonModule, PanelModule } from 'primeng/primeng';
 import { CryptoApiClient, IExchangeMeta } from '../../services/api-client';
 
 interface City {
