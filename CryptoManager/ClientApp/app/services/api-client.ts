@@ -90,7 +90,7 @@ export class CryptoApiClient {
     /**
      * @return Success
      */
-    apiExchangesGet(): Observable<Exchange[]> {
+    apiExchangesGet(): Observable<ExchangeDto[]> {
         let url_ = this.baseUrl + "/api/Exchanges";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -110,14 +110,14 @@ export class CryptoApiClient {
                 try {
                     return this.processApiExchangesGet(<any>response_);
                 } catch (e) {
-                    return <Observable<Exchange[]>><any>Observable.throw(e);
+                    return <Observable<ExchangeDto[]>><any>Observable.throw(e);
                 }
             } else
-                return <Observable<Exchange[]>><any>Observable.throw(response_);
+                return <Observable<ExchangeDto[]>><any>Observable.throw(response_);
         });
     }
 
-    protected processApiExchangesGet(response: HttpResponseBase): Observable<Exchange[]> {
+    protected processApiExchangesGet(response: HttpResponseBase): Observable<ExchangeDto[]> {
         const status = response.status;
         const responseBlob = 
             response instanceof HttpResponse ? response.body : 
@@ -131,7 +131,7 @@ export class CryptoApiClient {
             if (resultData200 && resultData200.constructor === Array) {
                 result200 = [];
                 for (let item of resultData200)
-                    result200.push(Exchange.fromJS(item));
+                    result200.push(ExchangeDto.fromJS(item));
             }
             return Observable.of(result200);
             });
@@ -140,7 +140,7 @@ export class CryptoApiClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
-        return Observable.of<Exchange[]>(<any>null);
+        return Observable.of<ExchangeDto[]>(<any>null);
     }
 
     /**
@@ -251,6 +251,53 @@ export interface IExchangeMeta {
     labelPrivateKey?: string | undefined;
 }
 
+export class ExchangeDto implements IExchangeDto {
+    id?: string | undefined;
+    comment?: string | undefined;
+    exchangeName?: string | undefined;
+    exchange?: ExchangeDtoExchange | undefined;
+
+    constructor(data?: IExchangeDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.id = data["id"];
+            this.comment = data["comment"];
+            this.exchangeName = data["exchangeName"];
+            this.exchange = data["exchange"];
+        }
+    }
+
+    static fromJS(data: any): ExchangeDto {
+        let result = new ExchangeDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["comment"] = this.comment;
+        data["exchangeName"] = this.exchangeName;
+        data["exchange"] = this.exchange;
+        return data; 
+    }
+}
+
+export interface IExchangeDto {
+    id?: string | undefined;
+    comment?: string | undefined;
+    exchangeName?: string | undefined;
+    exchange?: ExchangeDtoExchange | undefined;
+}
+
 export class Exchange implements IExchange {
     id?: string | undefined;
     comment?: string | undefined;
@@ -303,6 +350,10 @@ export interface IExchange {
 }
 
 export enum ExchangeMetaExchangeId {
+    _1 = 1, 
+}
+
+export enum ExchangeDtoExchange {
     _1 = 1, 
 }
 

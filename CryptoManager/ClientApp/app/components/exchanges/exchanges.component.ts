@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { SelectItem } from 'primeng/primeng';
-import { CryptoApiClient, IExchangeMeta, Exchange, ExchangeId } from '../../services/api-client';
+import { CryptoApiClient, IExchangeMeta, Exchange, ExchangeDto } from '../../services/api-client';
 
 interface City {
   name: string;
@@ -20,7 +20,9 @@ export class ExchangesComponent implements OnInit {
   publicKey: string;
   privateKey: string;
   comment: string;
-  showForm : boolean;
+  showForm: boolean;
+
+  ownExchanges: ExchangeDto[];
 
   constructor(private apiClient: CryptoApiClient) {
 
@@ -36,7 +38,7 @@ export class ExchangesComponent implements OnInit {
 
   addExchange() {
     let exchange = new Exchange({
-      exchangeId: <any>(<IExchangeMeta>this.selectedAvailableExchange).exchangeId,
+      exchangeId: <any>(this.selectedAvailableExchange).exchangeId,
       comment: this.comment,
       privateKey: this.privateKey,
       publicKey: this.publicKey
@@ -47,6 +49,7 @@ export class ExchangesComponent implements OnInit {
       this.publicKey = "";
       this.privateKey = "";
       this.showForm = false;
+      this.refreshOwnExchanges();
     });
   }
 
@@ -59,7 +62,11 @@ export class ExchangesComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.refreshOwnExchanges();
   }
 
+  refreshOwnExchanges() {
+    this.apiClient.apiExchangesGet().subscribe(res => this.ownExchanges = res);
+  }
 }
 
