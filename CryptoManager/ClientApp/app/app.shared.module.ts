@@ -7,7 +7,7 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { DropdownModule, ButtonModule } from 'primeng/primeng';
+import { DropdownModule, ButtonModule, DataTableModule, SharedModule } from 'primeng/primeng';
 
 
 import { AppComponent } from './components/app/app.component';
@@ -35,6 +35,8 @@ import { CryptoApiClient } from './services/api-client';
 
     DropdownModule,
     ButtonModule,
+    DataTableModule,
+    SharedModule,
 
     BrowserModule,
     BrowserAnimationsModule,

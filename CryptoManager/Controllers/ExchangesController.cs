@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using CryptoManager.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Model.DbModels;
+using Model.DTOs;
 using Model.Meta;
 using Plugins;
 
@@ -16,10 +18,13 @@ namespace CryptoManager.Controllers
     public class ExchangesController : Controller
     {
         private readonly CryptoContext _cryptoContext;
+        private readonly IMapper _mapper;
 
-        public ExchangesController(CryptoContext cryptoContext)
+
+        public ExchangesController(CryptoContext cryptoContext, IMapper mapper)
         {
             _cryptoContext = cryptoContext;
+            _mapper = mapper;
         }
 
         [HttpGet("availableExchanges")]
@@ -44,9 +49,11 @@ namespace CryptoManager.Controllers
 
         // GET: api/Exchanges
         [HttpGet]
-        public IOrderedQueryable<Exchange> Get()
+        public IEnumerable<ExchangeDto> Get()
         {
-            return _cryptoContext.Exchanges.OrderByDescending(e => e.ExchangeId.ToString());
+            var data = _cryptoContext.Exchanges.OrderByDescending(e => e.ExchangeId.ToString());
+            var res = _mapper.Map<IEnumerable<ExchangeDto>>(data);
+            return res;
         }
 
 
