@@ -7,7 +7,7 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { DropdownModule } from 'primeng/primeng';     
+import { DropdownModule, ButtonModule } from 'primeng/primeng';
 
 
 import { AppComponent } from './components/app/app.component';
@@ -20,36 +20,38 @@ import { ExchangesComponent } from './components/exchanges/exchanges.component';
 import { CryptoApiClient } from './services/api-client';
 
 @NgModule({
-    declarations: [
-        AppComponent,
-        NavMenuComponent,
-        CounterComponent,
-        FetchDataComponent,
-      HomeComponent,
-      ExchangesComponent
-    ],
-    imports: [
-        CommonModule,
-        HttpModule,
-      FormsModule,
+  declarations: [
+    AppComponent,
+    NavMenuComponent,
+    CounterComponent,
+    FetchDataComponent,
+    HomeComponent,
+    ExchangesComponent
+  ],
+  imports: [
+    CommonModule,
+    HttpModule,
+    FormsModule,
 
-      DropdownModule,
-      BrowserModule,
-      BrowserAnimationsModule,
-      HttpClientModule,
+    DropdownModule,
+    ButtonModule,
 
-        RouterModule.forRoot([
-            { path: '', redirectTo: 'home', pathMatch: 'full' },
-            { path: 'home', component: HomeComponent },
-            { path: 'counter', component: CounterComponent },
-            { path: 'fetch-data', component: FetchDataComponent },
-            { path: 'exchanges', component: ExchangesComponent },
-            { path: '**', redirectTo: 'home' }
-        ])
-    ],
-    providers: [
-      CryptoApiClient
-    ]
+    BrowserModule,
+    BrowserAnimationsModule,
+    HttpClientModule,
+
+    RouterModule.forRoot([
+      { path: '', redirectTo: 'home', pathMatch: 'full' },
+      { path: 'home', component: HomeComponent },
+      { path: 'counter', component: CounterComponent },
+      { path: 'fetch-data', component: FetchDataComponent },
+      { path: 'exchanges', component: ExchangesComponent },
+      { path: '**', redirectTo: 'home' }
+    ])
+  ],
+  providers: [
+    CryptoApiClient
+  ]
 })
 export class AppModuleShared {
 }
