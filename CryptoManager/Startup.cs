@@ -9,12 +9,15 @@ using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NLog;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace CryptoManager
 {
     public class Startup
     {
+        private readonly ILogger Logger = LogManager.GetCurrentClassLogger();
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -54,6 +57,24 @@ namespace CryptoManager
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+
+
+
+            // Migrate and seed the database during startup. Must be synchronous.
+            try
+            {
+                using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
+                    .CreateScope())
+                {
+                    serviceScope.ServiceProvider.GetService<CryptoContext>().Database.Migrate();
+                }
+            }
+            catch (Exception ex)
+            {
+                // I'm using Serilog here, but use the logging solution of your choice.
+                Logger.Error(ex, "Failed to migrate database");
+            }
+
 
             app.UseStaticFiles();
 
