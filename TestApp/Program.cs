@@ -13,10 +13,10 @@ namespace TestApp
 
             var options = new DbContextOptions<CryptoContext>();
 
-            var ctx = new CryptoContext();
+            //var ctx = new CryptoContext();
             
-            ctx.Transactions.Add(new CryptoTransaction());
-            ctx.SaveChanges();
+            //ctx.Transactions.Add(new CryptoTransaction());
+            //ctx.SaveChanges();
         }
     }
 }
