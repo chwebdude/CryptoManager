@@ -90,7 +90,7 @@ export class CryptoApiClient {
     /**
      * @return Success
      */
-    apiExchangesGet(): Observable<string[]> {
+    apiExchangesGet(): Observable<Exchange[]> {
         let url_ = this.baseUrl + "/api/Exchanges";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -110,14 +110,14 @@ export class CryptoApiClient {
                 try {
                     return this.processApiExchangesGet(<any>response_);
                 } catch (e) {
-                    return <Observable<string[]>><any>Observable.throw(e);
+                    return <Observable<Exchange[]>><any>Observable.throw(e);
                 }
             } else
-                return <Observable<string[]>><any>Observable.throw(response_);
+                return <Observable<Exchange[]>><any>Observable.throw(response_);
         });
     }
 
-    protected processApiExchangesGet(response: HttpResponseBase): Observable<string[]> {
+    protected processApiExchangesGet(response: HttpResponseBase): Observable<Exchange[]> {
         const status = response.status;
         const responseBlob = 
             response instanceof HttpResponse ? response.body : 
@@ -131,7 +131,7 @@ export class CryptoApiClient {
             if (resultData200 && resultData200.constructor === Array) {
                 result200 = [];
                 for (let item of resultData200)
-                    result200.push(item);
+                    result200.push(Exchange.fromJS(item));
             }
             return Observable.of(result200);
             });
@@ -140,14 +140,14 @@ export class CryptoApiClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
-        return Observable.of<string[]>(<any>null);
+        return Observable.of<Exchange[]>(<any>null);
     }
 
     /**
      * @value (optional) 
      * @return Success
      */
-    apiExchangesPost(value: string | null | undefined): Observable<void> {
+    apiExchangesPost(value: Exchange | null | undefined): Observable<void> {
         let url_ = this.baseUrl + "/api/Exchanges";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -177,167 +177,6 @@ export class CryptoApiClient {
     }
 
     protected processApiExchangesPost(response: HttpResponseBase): Observable<void> {
-        const status = response.status;
-        const responseBlob = 
-            response instanceof HttpResponse ? response.body : 
-            response instanceof HttpErrorResponse ? response.error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(responseBlob).flatMap(_responseText => {
-            return Observable.of<void>(<any>null);
-            });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).flatMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Observable.of<void>(<any>null);
-    }
-
-    /**
-     * @return Success
-     */
-    apiExchangesByIdGet(id: number): Observable<string> {
-        let url_ = this.baseUrl + "/api/Exchanges/{id}";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("get", url_, options_).flatMap((response_ : any) => {
-            return this.processApiExchangesByIdGet(response_);
-        }).catch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processApiExchangesByIdGet(<any>response_);
-                } catch (e) {
-                    return <Observable<string>><any>Observable.throw(e);
-                }
-            } else
-                return <Observable<string>><any>Observable.throw(response_);
-        });
-    }
-
-    protected processApiExchangesByIdGet(response: HttpResponseBase): Observable<string> {
-        const status = response.status;
-        const responseBlob = 
-            response instanceof HttpResponse ? response.body : 
-            response instanceof HttpErrorResponse ? response.error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(responseBlob).flatMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = resultData200 !== undefined ? resultData200 : <any>null;
-            return Observable.of(result200);
-            });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).flatMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Observable.of<string>(<any>null);
-    }
-
-    /**
-     * @value (optional) 
-     * @return Success
-     */
-    apiExchangesByIdPut(id: number, value: string | null | undefined): Observable<void> {
-        let url_ = this.baseUrl + "/api/Exchanges/{id}";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(value);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
-            })
-        };
-
-        return this.http.request("put", url_, options_).flatMap((response_ : any) => {
-            return this.processApiExchangesByIdPut(response_);
-        }).catch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processApiExchangesByIdPut(<any>response_);
-                } catch (e) {
-                    return <Observable<void>><any>Observable.throw(e);
-                }
-            } else
-                return <Observable<void>><any>Observable.throw(response_);
-        });
-    }
-
-    protected processApiExchangesByIdPut(response: HttpResponseBase): Observable<void> {
-        const status = response.status;
-        const responseBlob = 
-            response instanceof HttpResponse ? response.body : 
-            response instanceof HttpErrorResponse ? response.error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(responseBlob).flatMap(_responseText => {
-            return Observable.of<void>(<any>null);
-            });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).flatMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Observable.of<void>(<any>null);
-    }
-
-    /**
-     * @return Success
-     */
-    apiExchangesByIdDelete(id: number): Observable<void> {
-        let url_ = this.baseUrl + "/api/Exchanges/{id}";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
-            })
-        };
-
-        return this.http.request("delete", url_, options_).flatMap((response_ : any) => {
-            return this.processApiExchangesByIdDelete(response_);
-        }).catch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processApiExchangesByIdDelete(<any>response_);
-                } catch (e) {
-                    return <Observable<void>><any>Observable.throw(e);
-                }
-            } else
-                return <Observable<void>><any>Observable.throw(response_);
-        });
-    }
-
-    protected processApiExchangesByIdDelete(response: HttpResponseBase): Observable<void> {
         const status = response.status;
         const responseBlob = 
             response instanceof HttpResponse ? response.body : 
@@ -412,7 +251,62 @@ export interface IExchangeMeta {
     labelPrivateKey?: string | undefined;
 }
 
+export class Exchange implements IExchange {
+    id?: string | undefined;
+    comment?: string | undefined;
+    publicKey?: string | undefined;
+    privateKey?: string | undefined;
+    exchangeId?: ExchangeId | undefined;
+
+    constructor(data?: IExchange) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.id = data["id"];
+            this.comment = data["comment"];
+            this.publicKey = data["publicKey"];
+            this.privateKey = data["privateKey"];
+            this.exchangeId = data["exchangeId"];
+        }
+    }
+
+    static fromJS(data: any): Exchange {
+        let result = new Exchange();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["comment"] = this.comment;
+        data["publicKey"] = this.publicKey;
+        data["privateKey"] = this.privateKey;
+        data["exchangeId"] = this.exchangeId;
+        return data; 
+    }
+}
+
+export interface IExchange {
+    id?: string | undefined;
+    comment?: string | undefined;
+    publicKey?: string | undefined;
+    privateKey?: string | undefined;
+    exchangeId?: ExchangeId | undefined;
+}
+
 export enum ExchangeMetaExchangeId {
+    _1 = 1, 
+}
+
+export enum ExchangeId {
     _1 = 1, 
 }
 

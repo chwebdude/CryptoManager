@@ -14,5 +14,6 @@ namespace Model.DbModels
         public string PublicKey { get; set; }
 
         public string PrivateKey { get; set; }
+        public Enums.Exchange ExchangeId { get; set; }
     }
 }

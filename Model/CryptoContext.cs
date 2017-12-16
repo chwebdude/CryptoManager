@@ -18,5 +18,6 @@ namespace CryptoManager.Models
 
         public DbSet<CryptoTransaction> Transactions { get; set; }
         public DbSet<Setting> Settings { get; set; }
+        public DbSet<Exchange> Exchanges{ get; set; }
     }
 }

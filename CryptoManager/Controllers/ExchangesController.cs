@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CryptoManager.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Model.DbModels;
 using Model.Meta;
 using Plugins;
 
@@ -13,6 +15,13 @@ namespace CryptoManager.Controllers
     [Route("api/Exchanges")]
     public class ExchangesController : Controller
     {
+        private readonly CryptoContext _cryptoContext;
+
+        public ExchangesController(CryptoContext cryptoContext)
+        {
+            _cryptoContext = cryptoContext;
+        }
+
         [HttpGet("availableExchanges")]
         public async Task<IEnumerable<ExchangeMeta>> GetAvaliableExchanges()
         {
@@ -25,7 +34,7 @@ namespace CryptoManager.Controllers
                 var res = new List<ExchangeMeta>();
                 foreach (var importer in types)
                 {
-                    var i = (IImporter) Activator.CreateInstance(importer);
+                    var i = (IImporter)Activator.CreateInstance(importer);
                     var meta = i.GetExchangeMeta();
                     res.Add(meta);
                 }
@@ -35,34 +44,33 @@ namespace CryptoManager.Controllers
 
         // GET: api/Exchanges
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IOrderedQueryable<Exchange> Get()
         {
-            return new string[] { "value1", "value2" };
+            return _cryptoContext.Exchanges.OrderByDescending(e => e.ExchangeId.ToString());
         }
 
-        // GET: api/Exchanges/5
-        [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
-        {
-            return "value";
-        }
 
         // POST: api/Exchanges
         [HttpPost]
-        public void Post([FromBody]string value)
+        public async Task AddNewImporter([FromBody]Exchange value)
         {
+            // Validation
+            var availableExchanges = await GetAvaliableExchanges();
+            var exchangeMeta = availableExchanges.SingleOrDefault(e => e.ExchangeId == value.ExchangeId);
+
+            if (exchangeMeta == null)
+                throw new ArgumentException("No exchange Plugin exists for this exchange");
+
+            if (exchangeMeta.SupportsPrivateKey && string.IsNullOrEmpty(value.PrivateKey))
+                throw new ArgumentOutOfRangeException(nameof(value.PrivateKey), exchangeMeta.LabelPrivateKey + " was not provided");
+
+            if (exchangeMeta.SupportsPublicKey && string.IsNullOrEmpty(value.PublicKey))
+                throw new ArgumentOutOfRangeException(nameof(value.PublicKey), exchangeMeta.LabelPublicKey + " was not provided");
+
+            // Add Data
+            await _cryptoContext.Exchanges.AddAsync(value);
+            await _cryptoContext.SaveChangesAsync();
         }
 
-        // PUT: api/Exchanges/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
     }
 }
