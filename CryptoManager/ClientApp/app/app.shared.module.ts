@@ -7,7 +7,7 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { DropdownModule, ButtonModule, DataTableModule, SharedModule } from 'primeng/primeng';
+import { DropdownModule, ButtonModule, DataTableModule, SharedModule, ConfirmDialogModule, ConfirmationService } from 'primeng/primeng';
 
 
 import { AppComponent } from './components/app/app.component';
@@ -37,6 +37,7 @@ import { CryptoApiClient } from './services/api-client';
     ButtonModule,
     DataTableModule,
     SharedModule,
+    ConfirmDialogModule,
 
     BrowserModule,
     BrowserAnimationsModule,
@@ -52,7 +53,9 @@ import { CryptoApiClient } from './services/api-client';
     ])
   ],
   providers: [
-    CryptoApiClient
+    CryptoApiClient,
+
+    ConfirmationService
   ]
 })
 export class AppModuleShared {

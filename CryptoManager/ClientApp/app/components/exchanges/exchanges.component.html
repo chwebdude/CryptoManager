@@ -1,9 +1,9 @@
 <h1>Exchanges</h1>
 <h2>Add importer</h2>
-<p-dropdown [options]="availableExchanges" [(ngModel)]="selectedAvailableExchange" (onChange)="exchangeChanged()" ></p-dropdown>
+<p-dropdown [options]="availableExchanges" [(ngModel)]="selectedAvailableExchange" (onChange)="exchangeChanged()"></p-dropdown>
 
 <div *ngIf="showForm">
-<!--<div [hidden]="selectedAvailableExchange == null">-->
+    <!--<div [hidden]="selectedAvailableExchange == null">-->
 
     <div class="panel panel-default">
         <div class="panel-heading">{{selectedAvailableExchange.name}}</div>
@@ -31,11 +31,17 @@
     </div>
 </div>
 
-<br/>
-<br/>
-<br/>
+<br />
+<br />
+<br />
+<p-confirmDialog></p-confirmDialog>
 
 <p-dataTable [value]="ownExchanges">
     <p-column field="exchangeName" header="Exchange"></p-column>
     <p-column field="comment" header="Comment"></p-column>
+    <p-column styleClass="col-button" header="Remove" [style]="{'width': '80px'}">
+        <ng-template let-exchange="rowData" pTemplate="body">
+            <button type="button" pButton (click)="remove(exchange)" icon="fa-trash"></button>
+        </ng-template>
+    </p-column>
 </p-dataTable>

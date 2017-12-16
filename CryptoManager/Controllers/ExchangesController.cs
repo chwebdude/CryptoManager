@@ -6,6 +6,7 @@ using AutoMapper;
 using CryptoManager.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Model.DbModels;
 using Model.DTOs;
 using Model.Meta;
@@ -79,5 +80,16 @@ namespace CryptoManager.Controllers
             await _cryptoContext.SaveChangesAsync();
         }
 
+        [HttpDelete]
+        public async Task<IActionResult> Remove(Guid id)
+        {
+            var obj = await _cryptoContext.Exchanges.FindAsync(id);
+            if (obj == null)
+                return NotFound();
+
+            _cryptoContext.Exchanges.Remove(obj);
+            await _cryptoContext.SaveChangesAsync();
+            return Ok();
+        }
     }
 }

@@ -1,16 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { SelectItem } from 'primeng/primeng';
+import { SelectItem, ConfirmationService } from 'primeng/primeng';
 import { CryptoApiClient, IExchangeMeta, Exchange, ExchangeDto } from '../../services/api-client';
 
-interface City {
-  name: string;
-  code: string;
-}
 
 @Component({
   selector: 'app-exchanges',
   templateUrl: './exchanges.component.html',
-  styleUrls: ['./exchanges.component.css']
+  styleUrls: ['./exchanges.component.css'],
+  providers: [ConfirmationService]
 })
 
 export class ExchangesComponent implements OnInit {
@@ -24,7 +21,7 @@ export class ExchangesComponent implements OnInit {
 
   ownExchanges: ExchangeDto[];
 
-  constructor(private apiClient: CryptoApiClient) {
+  constructor(private apiClient: CryptoApiClient, private confirmationService: ConfirmationService) {
 
     apiClient.apiExchangesAvailableExchangesGet().subscribe(ex => {
       for (let entry of ex) {
@@ -67,6 +64,23 @@ export class ExchangesComponent implements OnInit {
 
   refreshOwnExchanges() {
     this.apiClient.apiExchangesGet().subscribe(res => this.ownExchanges = res);
+  }
+
+
+  remove(exchange: ExchangeDto) {
+    console.warn("Delete...");
+    this.confirmationService.confirm({
+      header: 'Delete',
+      message: 'Do you really want to delete the connection to the exchange ' +
+      <string>exchange.exchangeName +
+      " (" +
+      <string>exchange.comment +
+      ")",
+      accept: () => {
+        this.apiClient.apiExchangesDelete((exchange.id) as string).subscribe(() => this.refreshOwnExchanges());
+      }
+    });
+
   }
 }
 
