@@ -12,9 +12,10 @@ using System;
 namespace Model.Migrations
 {
     [DbContext(typeof(CryptoContext))]
-    partial class CryptoContextModelSnapshot : ModelSnapshot
+    [Migration("20171216160014_AddImportExchanges")]
+    partial class AddImportExchanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
