@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using BackgroundServices;
 using CryptoManager.Models;
 using Hangfire;
 using Hangfire.MemoryStorage;
@@ -19,7 +20,7 @@ namespace CryptoManager
 {
     public class Startup
     {
-        private readonly ILogger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
         public Startup(IConfiguration configuration)
         {
@@ -87,6 +88,7 @@ namespace CryptoManager
             // Enable Hangfire
             app.UseHangfireDashboard();
             app.UseHangfireServer();
+            
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
@@ -108,6 +110,8 @@ namespace CryptoManager
                     name: "spa-fallback",
                     defaults: new { controller = "Home", action = "Index" });
             });
+
+            BackgroundJob.Enqueue<Importer>(i => i.ImportAll());
         }
     }
 }

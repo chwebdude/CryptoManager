@@ -11,5 +11,6 @@ namespace Plugins
     {                
         Task<IEnumerable<CryptoTransaction>> GetTransactions(Exchange exchange);
         ExchangeMeta GetExchangeMeta();
+        Model.Enums.Exchange Exchange { get; }
     }
 }
