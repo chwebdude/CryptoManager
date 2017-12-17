@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using BackgroundServices;
 using CryptoManager.Models;
+using Hangfire;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -78,6 +80,9 @@ namespace CryptoManager.Controllers
             // Add Data
             await _cryptoContext.Exchanges.AddAsync(value);
             await _cryptoContext.SaveChangesAsync();
+
+            // Schedule import
+            BackgroundJob.Enqueue<Importer>(i => i.Import(value.Id));
         }
 
         [HttpDelete]
