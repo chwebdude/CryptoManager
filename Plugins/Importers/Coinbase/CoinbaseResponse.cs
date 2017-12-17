@@ -5,7 +5,7 @@ namespace Plugins.Importers.Coinbase
 {
     internal class CoinbaseResponse<T>
     {
-        internal T Data { get; set; }
+        internal T data { get; set; }
         internal CoinbaseMessage[] Warnings { get; set; }
         internal CoinbaseMessage[] Errors { get; set; }
     }
@@ -25,10 +25,10 @@ namespace Plugins.Importers.Coinbase
     {
         internal string Id { get; set; }
         internal string Name { get; set; }
-        internal bool Primary { get; set; }
-        internal WalletType Type { get; set; }
-        internal CoinbaseCurrency Currency { get; set; }
-        internal CoinbaseBalance Balance { get; set; }
+        //internal bool Primary { get; set; }
+        //internal WalletType Type { get; set; }
+        //internal CoinbaseCurrency Currency { get; set; }
+        //internal CoinbaseBalance Balance { get; set; }
     }
 
     internal class CoinbaseBalance

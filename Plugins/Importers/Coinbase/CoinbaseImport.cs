@@ -11,7 +11,7 @@ using RestSharp;
 
 namespace Plugins.Importers.Coinbase
 {
-    class CoinbaseImport : IImporter
+  public  class CoinbaseImport : IImporter
     {
         private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
         private string _apiSecret;
@@ -24,7 +24,8 @@ namespace Plugins.Importers.Coinbase
             var cryptoTransactions = new List<CryptoTransaction>();
 
             // 1. Get all Wallets
-            var wallets = await ExecuteCoinbaseGet<IEnumerable<CoinbaseWallet>>("/v2/accounts");
+            //var wallets = await ExecuteCoinbaseGet<CoinbaseWallet[]>("/v2/accounts");
+            var wallets = await ExecuteCoinbaseGetWallet("/v2/accounts");
             await Task.Delay(1000);
 
             // 2. Query all Wallets
@@ -48,12 +49,14 @@ namespace Plugins.Importers.Coinbase
         {
             return new ExchangeMeta()
             {
-                ExchangeId = Model.Enums.Exchange.Coinbase,
+                ExchangeId = Exchange,
                 Name = "Coinbase",
                 LabelPrivateKey = "Private Key",
                 LabelPublicKey = "Public Key"                
             };
         }
+
+        public Model.Enums.Exchange Exchange => Model.Enums.Exchange.Coinbase;
 
         private CryptoTransaction MappTransaction(CoinbaseTransaction transaction)
         {
@@ -126,11 +129,50 @@ namespace Plugins.Importers.Coinbase
                     foreach (var message in content.Errors)
                     {
                         //Todo: Log error
-
+                        Logger.Error(message);
                     }
 
                 }
-                return content.Data;
+                return content.data;
+            }
+        }
+
+
+
+
+        private async Task<CoinbaseWallet[]> ExecuteCoinbaseGetWallet(string requestPath)
+        {
+            var client = new RestClient("https://api.coinbase.com/");
+            var request = new RestRequest(requestPath);
+            Logger.Trace("GET {0}", requestPath);
+            var unixTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds();
+            var toSign = unixTimestamp + "GET" + requestPath;
+
+            using (var shaAlgorithm = new HMACSHA256(Encoding.UTF8.GetBytes(_apiSecret)))
+            {
+                var signatureBytes = Encoding.UTF8.GetBytes(toSign);
+                var signatureHashBytes = shaAlgorithm.ComputeHash(signatureBytes);
+                var signatureHashHex = string.Concat(Array.ConvertAll(signatureHashBytes, b => b.ToString("X2"))).ToLower();
+
+                request.AddHeader("CB-ACCESS-KEY", _apiKey);
+                request.AddHeader("CB-ACCESS-SIGN", signatureHashHex);
+                request.AddHeader("CB-ACCESS-TIMESTAMP", unixTimestamp.ToString());
+
+                var res = await client.ExecuteTaskAsync(request);
+
+
+                var content = JsonConvert.DeserializeObject<CoinbaseResponse<CoinbaseWallet[]>>(res.Content);
+                var c2 = JsonConvert.DeserializeObject(res.Content);
+                if (content.Errors != null)
+                {
+                    foreach (var message in content.Errors)
+                    {
+                        //Todo: Log error
+                        Logger.Error(message);
+                    }
+
+                }
+                return content.data;
             }
         }
     }
