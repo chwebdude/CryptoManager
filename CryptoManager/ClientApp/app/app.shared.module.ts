@@ -16,6 +16,7 @@ import { HomeComponent } from './components/home/home.component';
 import { FetchDataComponent } from './components/fetchdata/fetchdata.component';
 import { CounterComponent } from './components/counter/counter.component';
 import { ExchangesComponent } from './components/exchanges/exchanges.component';
+import { TransactionsComponent } from './components/transactions/transactions.component';
 
 import { CryptoApiClient } from './services/api-client';
 
@@ -26,7 +27,8 @@ import { CryptoApiClient } from './services/api-client';
     CounterComponent,
     FetchDataComponent,
     HomeComponent,
-    ExchangesComponent
+    ExchangesComponent,
+    TransactionsComponent
   ],
   imports: [
     CommonModule,
@@ -47,7 +49,7 @@ import { CryptoApiClient } from './services/api-client';
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', component: HomeComponent },
       { path: 'counter', component: CounterComponent },
-      { path: 'fetch-data', component: FetchDataComponent },
+      { path: 'transactions', component: TransactionsComponent },
       { path: 'exchanges', component: ExchangesComponent },
       { path: '**', redirectTo: 'home' }
     ])
