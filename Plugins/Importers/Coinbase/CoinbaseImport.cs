@@ -107,13 +107,13 @@ namespace Plugins.Importers.Coinbase
                 case CoinbaseTransactionTypes.Exchange_Deposit:
                     // Moved to GDAX
                     crypto.Type = TransactionType.Transfer;
-                    crypto.OutAmount = transaction.Amount.Amount;
+                    crypto.OutAmount = -1 * transaction.Amount.Amount;
                     crypto.OutCurrency = transaction.Amount.Currency;
                     break;
                 case CoinbaseTransactionTypes.Exchange_Withdrawal:
                     // From GDAX
                     crypto.Type = TransactionType.Transfer;
-                    crypto.InAmount = -1 * transaction.Amount.Amount;
+                    crypto.InAmount = transaction.Amount.Amount;
                     crypto.InCurrency = transaction.Amount.Currency;
                     break;
                 default:
