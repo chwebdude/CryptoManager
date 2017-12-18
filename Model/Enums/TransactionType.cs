@@ -6,10 +6,16 @@ namespace Model.Enums
 {
     public enum TransactionType
     {
+        // Exchange or something like that
         Trade,
+
+        // When coin or fiat received
         In,
-        Mining,
+
+        // When coin or fiat sending
         Out,
-        Transfer
+
+        // Todo: To be defined
+        //Mining,
     }
 }

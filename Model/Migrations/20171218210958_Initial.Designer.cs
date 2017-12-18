@@ -12,8 +12,8 @@ using System;
 namespace Model.Migrations
 {
     [DbContext(typeof(CryptoContext))]
-    [Migration("20171216160014_AddImportExchanges")]
-    partial class AddImportExchanges
+    [Migration("20171218210958_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -40,21 +40,25 @@ namespace Model.Migrations
 
                     b.Property<string>("FeeCurrency");
 
-                    b.Property<string>("InAdress");
+                    b.Property<string>("FromAddress");
 
                     b.Property<decimal>("InAmount");
 
                     b.Property<string>("InCurrency");
 
-                    b.Property<string>("OutAdress");
-
                     b.Property<decimal>("OutAmount");
 
                     b.Property<string>("OutCurrency");
 
+                    b.Property<decimal>("Rate");
+
                     b.Property<decimal>("SellAmount");
 
                     b.Property<string>("SellCurrency");
+
+                    b.Property<string>("ToAddress");
+
+                    b.Property<string>("TransactionHash");
 
                     b.Property<string>("TransactionKey");
 
@@ -81,6 +85,22 @@ namespace Model.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Exchanges");
+                });
+
+            modelBuilder.Entity("Model.DbModels.Fund", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<decimal>("Amount");
+
+                    b.Property<string>("Currency");
+
+                    b.Property<Guid>("ExchangeId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Funds");
                 });
 
             modelBuilder.Entity("Model.DbModels.Setting", b =>

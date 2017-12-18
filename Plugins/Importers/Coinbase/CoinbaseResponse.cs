@@ -94,7 +94,7 @@ namespace Plugins.Importers.Coinbase
         public DateTime Payout_At { get; set; }
         public CoinbaseBuy Buy { get; set; }
         public object From { get; set; }
-        public object To { get; set; }
+        public CoinbaseTo To { get; set; }
         public CoinbaseBuy Fiat_Deposit { get; set; }
         public CoinbaseDetails Details { get; set; }
         public string Resource { get; set; }
@@ -103,10 +103,20 @@ namespace Plugins.Importers.Coinbase
         public CoinbaseNetwork Network { get; set; }
     }
 
+    public class CoinbaseTo
+    {
+        public string Address { get; set; }
+        public string Currency { get; set; }
+        public string Resource { get; set; }
+    }
+
     public class CoinbaseNetwork
     {
         public string Hash { get; set; }
         public CoinbaseTransactionStatus Status { get; set; }
+        public CoinbaseBalance Transaction_Amount { get; set; }
+        public CoinbaseBalance Transaction_Fee { get; set; }
+
     }
 
     public class CoinbaseDetails

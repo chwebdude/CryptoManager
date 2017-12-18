@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Hangfire;
 using Model.DbModels;
 using Model.Enums;
 using Plugins;
@@ -46,6 +47,9 @@ namespace BackgroundServices
             {
                 await Import(exchange.Id);
             }
+
+            BackgroundJob.Enqueue<Calculator>(c => c.RecalculateAll());
+
         }
 
         private IImporter GetImporter(Exchange exchangeId)

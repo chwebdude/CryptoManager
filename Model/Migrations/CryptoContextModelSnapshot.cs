@@ -39,13 +39,11 @@ namespace Model.Migrations
 
                     b.Property<string>("FeeCurrency");
 
-                    b.Property<string>("InAdress");
+                    b.Property<string>("FromAddress");
 
                     b.Property<decimal>("InAmount");
 
                     b.Property<string>("InCurrency");
-
-                    b.Property<string>("OutAdress");
 
                     b.Property<decimal>("OutAmount");
 
@@ -56,6 +54,8 @@ namespace Model.Migrations
                     b.Property<decimal>("SellAmount");
 
                     b.Property<string>("SellCurrency");
+
+                    b.Property<string>("ToAddress");
 
                     b.Property<string>("TransactionHash");
 
@@ -84,6 +84,22 @@ namespace Model.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Exchanges");
+                });
+
+            modelBuilder.Entity("Model.DbModels.Fund", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<decimal>("Amount");
+
+                    b.Property<string>("Currency");
+
+                    b.Property<Guid>("ExchangeId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Funds");
                 });
 
             modelBuilder.Entity("Model.DbModels.Setting", b =>
