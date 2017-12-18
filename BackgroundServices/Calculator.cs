@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace BackgroundServices
 {
-    class Calculator
+    public class Calculator
     {
         private readonly CryptoContext _context;
 
@@ -43,6 +43,7 @@ namespace BackgroundServices
                     case Model.Enums.TransactionType.Out:
                         break;
                 }
+                wallets[transaction.ExchangeId] = exchangeWallets;
             }
         }
 
