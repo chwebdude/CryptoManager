@@ -1,1 +1,27 @@
 <h1>Transactions</h1>
+<p-dataTable [value]="transactions">
+    <p-column field="exchangeName" header="Exchange"></p-column>
+    <p-column field="comment" header="Comment"></p-column>
+    <!--<p-column field="dateTime" header="Date"></p-column>-->
+    <p-column field="buyAmount" header="Buy Amount"></p-column>
+    <p-column field="buyCurrency" header="Buy Currency"></p-column>
+    <!--<p-column field="rate" header="Rate"></p-column>-->
+    
+    <p-column header="Rate">
+        <ng-template let-row="rowData" pTemplate="body">
+            <span>{{ row.rate | number}}</span>
+        </ng-template>
+
+    </p-column>
+
+    <p-column field="feeAmount" header="Fee Amount"></p-column>
+    <p-column field="feeCurrency" header="Fee Currency"></p-column>
+    <p-column field="inAmount" header="inAmount"></p-column>
+    <p-column field="inCurrency" header="inCurrency"></p-column>
+    <p-column field="outAmount" header="outAmount"></p-column>
+    <p-column field="outCurrency" header="outCurrency"></p-column>
+
+
+
+
+</p-dataTable>

@@ -9,6 +9,35 @@ namespace Model.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Exchanges",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    Comment = table.Column<string>(nullable: true),
+                    ExchangeId = table.Column<int>(nullable: false),
+                    PrivateKey = table.Column<string>(nullable: true),
+                    PublicKey = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Exchanges", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Funds",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    Amount = table.Column<decimal>(nullable: false),
+                    Currency = table.Column<string>(nullable: true),
+                    ExchangeId = table.Column<Guid>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Funds", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Settings",
                 columns: table => new
                 {
@@ -32,14 +61,16 @@ namespace Model.Migrations
                     ExchangeId = table.Column<Guid>(nullable: false),
                     FeeAmount = table.Column<decimal>(nullable: false),
                     FeeCurrency = table.Column<string>(nullable: true),
-                    InAdress = table.Column<string>(nullable: true),
+                    FromAddress = table.Column<string>(nullable: true),
                     InAmount = table.Column<decimal>(nullable: false),
                     InCurrency = table.Column<string>(nullable: true),
-                    OutAdress = table.Column<string>(nullable: true),
                     OutAmount = table.Column<decimal>(nullable: false),
                     OutCurrency = table.Column<string>(nullable: true),
+                    Rate = table.Column<decimal>(nullable: false),
                     SellAmount = table.Column<decimal>(nullable: false),
                     SellCurrency = table.Column<string>(nullable: true),
+                    ToAddress = table.Column<string>(nullable: true),
+                    TransactionHash = table.Column<string>(nullable: true),
                     TransactionKey = table.Column<string>(nullable: true),
                     Type = table.Column<int>(nullable: false)
                 },
@@ -51,6 +82,12 @@ namespace Model.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Exchanges");
+
+            migrationBuilder.DropTable(
+                name: "Funds");
+
             migrationBuilder.DropTable(
                 name: "Settings");
 
