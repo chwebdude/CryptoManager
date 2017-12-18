@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
+import { DecimalPipe } from '@angular/common';
 
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -28,7 +29,8 @@ import { CryptoApiClient } from './services/api-client';
     FetchDataComponent,
     HomeComponent,
     ExchangesComponent,
-    TransactionsComponent
+    TransactionsComponent,
+    
   ],
   imports: [
     CommonModule,

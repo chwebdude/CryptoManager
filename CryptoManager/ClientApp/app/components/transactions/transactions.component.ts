@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { CryptoApiClient } from '../../services/api-client';
+import { CryptoApiClient, CryptoTransaction } from '../../services/api-client';
+import { DecimalPipe } from '@angular/common';
 
 
 @Component({
@@ -10,12 +11,15 @@ import { CryptoApiClient } from '../../services/api-client';
 
 export class TransactionsComponent implements OnInit {
 
+  transactions: CryptoTransaction[];
+
   constructor(private apiClient: CryptoApiClient) {
   }
 
  
 
   ngOnInit() {
+    this.apiClient.apiTransactionsGet().subscribe(res => this.transactions = res);
   }
  
 }

@@ -7,35 +7,97 @@ namespace Model.DbModels
 {
     public class CryptoTransaction
     {
+        private CryptoTransaction() { }
+
+        // Fee is always added!
+        public static CryptoTransaction NewTrade(string transactionKey, DateTime dateTime, Guid exchangeId, string comment, decimal buyAmount, string buyCurrency, decimal fee, string feeCurrency, decimal sellAmount, string sellCurrency)
+        {
+            var t = new CryptoTransaction()
+            {
+                TransactionKey = transactionKey,
+                DateTime = dateTime,
+                ExchangeId = exchangeId,
+                Comment = comment,
+                BuyAmount = buyAmount,
+                BuyCurrency = buyCurrency,
+                FeeAmount = fee,
+                FeeCurrency = feeCurrency,
+                SellAmount = sellAmount,
+                SellCurrency = sellCurrency,
+                Rate = sellAmount / buyAmount
+            };
+
+            return t;
+        }
+
+        public static CryptoTransaction NewIn(string transactionKey, DateTime dateTime, Guid exchangeId, string comment, decimal inAmount, string inCurrency, string fromAddress, string toAddress, string transactionHash)
+        {
+            var t = new CryptoTransaction()
+            {
+                TransactionKey = transactionKey,
+                DateTime = dateTime,
+                ExchangeId = exchangeId,
+                Comment = comment,
+                InAmount = inAmount,
+                InCurrency = inCurrency,
+                FromAddress = fromAddress,
+                ToAddress = toAddress,
+                TransactionHash = transactionHash
+            };
+            return t;
+        }
+
+        public static CryptoTransaction NewOut(string transactionKey, DateTime dateTime, Guid exchangeId, string comment, decimal outAmount, string outCurrency, decimal fee, string feeCurrency, string fromAddress, string toAddress, string transactionHash)
+        {
+            var t = new CryptoTransaction()
+            {
+                TransactionKey = transactionKey,
+                DateTime = dateTime,
+                ExchangeId = exchangeId,
+                Comment = comment,
+                OutAmount = outAmount,
+                OutCurrency = outCurrency,
+                FeeAmount = fee,
+                FeeCurrency = feeCurrency,
+                FromAddress = fromAddress,
+                ToAddress = toAddress,
+                TransactionHash = transactionHash
+            };
+            return t;
+        }
+
+
+
         [Key]
-        public Guid Id { get; set; }
+        public Guid Id { get; private set; }
 
-        public TransactionType Type { get; set; }
-        public DateTime DateTime { get; set; }
+        public TransactionType Type { get; private set; }
+        public DateTime DateTime { get; private set; }
 
-        public decimal InAmount { get; set; }
-        public string InCurrency { get; set; }
-        public string InAdress { get; set; }
+        public decimal InAmount { get; private set; }
+        public string InCurrency { get; private set; }
 
-        public decimal OutAmount { get; set; }
-        public string OutCurrency { get; set; }
-        public string OutAdress { get; set; }
-        
-        public decimal FeeAmount { get; set; }
-        public string FeeCurrency{ get; set; }
+        public decimal OutAmount { get; private set; }
+        public string OutCurrency { get; private set; }
 
-        public decimal BuyAmount { get; set; }
-        public string BuyCurrency { get; set; }
+        public decimal FeeAmount { get; private set; }
+        public string FeeCurrency { get; private set; }
 
-        public decimal SellAmount { get; set; }
-        public string SellCurrency { get; set; }
+        public decimal BuyAmount { get; private set; }
+        public string BuyCurrency { get; private set; }
 
-        public decimal Rate { get; set; }
+        public decimal SellAmount { get; private set; }
+        public string SellCurrency { get; private set; }
 
-        public Guid ExchangeId { get; set; }
-        public string Comment { get; set; }
-        public string TransactionKey { get; set; }
+        public decimal Rate { get; private set; }
 
-        public string TransactionHash { get; set; }
+        public string FromAddress { get; set; }
+        public string ToAddress { get; set; }
+
+        public Guid ExchangeId { get; private set; }
+        public string Comment { get; private set; }
+        public string TransactionKey { get; private set; }
+
+        public string TransactionHash { get; private set; }
     }
 }
