@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Model.Enums;
 
 namespace Model.DbModels
@@ -29,9 +30,12 @@ namespace Model.DbModels
         public decimal SellAmount { get; set; }
         public string SellCurrency { get; set; }
 
+        public decimal Rate { get; set; }
 
         public Guid ExchangeId { get; set; }
         public string Comment { get; set; }
         public string TransactionKey { get; set; }
+
+        public string TransactionHash { get; set; }
     }
 }
