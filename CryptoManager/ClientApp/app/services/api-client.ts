@@ -246,6 +246,62 @@ export class CryptoApiClient {
         }
         return Observable.of<void>(<any>null);
     }
+
+    /**
+     * @return Success
+     */
+    apiTransactionsGet(): Observable<CryptoTransaction[]> {
+        let url_ = this.baseUrl + "/api/Transactions";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).flatMap((response_ : any) => {
+            return this.processApiTransactionsGet(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processApiTransactionsGet(<any>response_);
+                } catch (e) {
+                    return <Observable<CryptoTransaction[]>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<CryptoTransaction[]>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processApiTransactionsGet(response: HttpResponseBase): Observable<CryptoTransaction[]> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            response instanceof HttpErrorResponse ? response.error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).flatMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (resultData200 && resultData200.constructor === Array) {
+                result200 = [];
+                for (let item of resultData200)
+                    result200.push(CryptoTransaction.fromJS(item));
+            }
+            return Observable.of(result200);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<CryptoTransaction[]>(<any>null);
+    }
 }
 
 export class ExchangeMeta implements IExchangeMeta {
@@ -401,6 +457,117 @@ export interface IExchange {
     exchangeId?: ExchangeId | undefined;
 }
 
+export class CryptoTransaction implements ICryptoTransaction {
+    id?: string | undefined;
+    type?: CryptoTransactionType | undefined;
+    dateTime?: Date | undefined;
+    inAmount?: number | undefined;
+    inCurrency?: string | undefined;
+    inAdress?: string | undefined;
+    outAmount?: number | undefined;
+    outCurrency?: string | undefined;
+    outAdress?: string | undefined;
+    feeAmount?: number | undefined;
+    feeCurrency?: string | undefined;
+    buyAmount?: number | undefined;
+    buyCurrency?: string | undefined;
+    sellAmount?: number | undefined;
+    sellCurrency?: string | undefined;
+    rate?: number | undefined;
+    exchangeId?: string | undefined;
+    comment?: string | undefined;
+    transactionKey?: string | undefined;
+    transactionHash?: string | undefined;
+
+    constructor(data?: ICryptoTransaction) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.id = data["id"];
+            this.type = data["type"];
+            this.dateTime = data["dateTime"] ? new Date(data["dateTime"].toString()) : <any>undefined;
+            this.inAmount = data["inAmount"];
+            this.inCurrency = data["inCurrency"];
+            this.inAdress = data["inAdress"];
+            this.outAmount = data["outAmount"];
+            this.outCurrency = data["outCurrency"];
+            this.outAdress = data["outAdress"];
+            this.feeAmount = data["feeAmount"];
+            this.feeCurrency = data["feeCurrency"];
+            this.buyAmount = data["buyAmount"];
+            this.buyCurrency = data["buyCurrency"];
+            this.sellAmount = data["sellAmount"];
+            this.sellCurrency = data["sellCurrency"];
+            this.rate = data["rate"];
+            this.exchangeId = data["exchangeId"];
+            this.comment = data["comment"];
+            this.transactionKey = data["transactionKey"];
+            this.transactionHash = data["transactionHash"];
+        }
+    }
+
+    static fromJS(data: any): CryptoTransaction {
+        let result = new CryptoTransaction();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["type"] = this.type;
+        data["dateTime"] = this.dateTime ? this.dateTime.toISOString() : <any>undefined;
+        data["inAmount"] = this.inAmount;
+        data["inCurrency"] = this.inCurrency;
+        data["inAdress"] = this.inAdress;
+        data["outAmount"] = this.outAmount;
+        data["outCurrency"] = this.outCurrency;
+        data["outAdress"] = this.outAdress;
+        data["feeAmount"] = this.feeAmount;
+        data["feeCurrency"] = this.feeCurrency;
+        data["buyAmount"] = this.buyAmount;
+        data["buyCurrency"] = this.buyCurrency;
+        data["sellAmount"] = this.sellAmount;
+        data["sellCurrency"] = this.sellCurrency;
+        data["rate"] = this.rate;
+        data["exchangeId"] = this.exchangeId;
+        data["comment"] = this.comment;
+        data["transactionKey"] = this.transactionKey;
+        data["transactionHash"] = this.transactionHash;
+        return data; 
+    }
+}
+
+export interface ICryptoTransaction {
+    id?: string | undefined;
+    type?: CryptoTransactionType | undefined;
+    dateTime?: Date | undefined;
+    inAmount?: number | undefined;
+    inCurrency?: string | undefined;
+    inAdress?: string | undefined;
+    outAmount?: number | undefined;
+    outCurrency?: string | undefined;
+    outAdress?: string | undefined;
+    feeAmount?: number | undefined;
+    feeCurrency?: string | undefined;
+    buyAmount?: number | undefined;
+    buyCurrency?: string | undefined;
+    sellAmount?: number | undefined;
+    sellCurrency?: string | undefined;
+    rate?: number | undefined;
+    exchangeId?: string | undefined;
+    comment?: string | undefined;
+    transactionKey?: string | undefined;
+    transactionHash?: string | undefined;
+}
+
 export enum ExchangeMetaExchangeId {
     _1 = 1, 
 }
@@ -411,6 +578,14 @@ export enum ExchangeDtoExchange {
 
 export enum ExchangeId {
     _1 = 1, 
+}
+
+export enum CryptoTransactionType {
+    _0 = 0, 
+    _1 = 1, 
+    _2 = 2, 
+    _3 = 3, 
+    _4 = 4, 
 }
 
 export class SwaggerException extends Error {

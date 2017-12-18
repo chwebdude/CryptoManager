@@ -24,15 +24,18 @@ namespace BackgroundServices
             var importer = GetImporter(exchange.ExchangeId);
             var transactions = await importer.GetTransactions(exchange);
 
+            foreach (var transaction in transactions)
+            {
+                // Check if already in database and skip
+                var row = _context.Transactions.SingleOrDefault(t =>
+                    t.ExchangeId == exchangeId && t.TransactionKey == transaction.TransactionKey);
+                if (row == null)
+                    _context.Transactions.Add(transaction);
+            }
+            
 
-            //_context.Transactions.Add(new CryptoTransaction()
-            //{
-            //    Type = TransactionType.In,
-            //    ExchangeId = new Guid(),
-            //    BuyAmount = 22,
-            //    Id = new Guid()
-            //});
-            //_context.SaveChanges();
+        
+            _context.SaveChanges();
         }
 
 
