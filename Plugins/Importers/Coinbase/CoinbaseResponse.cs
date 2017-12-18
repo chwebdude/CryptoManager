@@ -3,109 +3,146 @@ using System.Collections.Generic;
 
 namespace Plugins.Importers.Coinbase
 {
-    internal class CoinbaseResponse<T>
+    public class CoinbaseResponse<T>
     {
-        internal T data { get; set; }
-        internal CoinbaseMessage[] Warnings { get; set; }
-        internal CoinbaseMessage[] Errors { get; set; }
+        public T Data { get; set; }
+        public CoinbaseMessage[] Warnings { get; set; }
+        public CoinbaseMessage[] Errors { get; set; }
+        public CoinbasePagination Pagination { get; set; }
     }
 
-    internal class CoinbaseMessage
+    public class CoinbasePagination
     {
-        internal string Key { get; set; }
-        internal string Message { get; set; }
+        public string Ending_Before { get; set; }
+        public string Starting_After { get; set; }
+        public int Limit { get; set; }
+        public string Order { get; set; }
+        public string Previous_Uri { get; set; }
+        public string Next_Uri { get; set; }
     }
 
-    internal class CoinbasePrice
+    public class CoinbaseMessage
     {
-        internal float Amount { get; set; }
+        public string Key { get; set; }
+        public string Message { get; set; }
     }
 
-    internal class CoinbaseWallet
+    public class CoinbasePrice
     {
-        internal string Id { get; set; }
-        internal string Name { get; set; }
-        //internal bool Primary { get; set; }
-        //internal WalletType Type { get; set; }
-        //internal CoinbaseCurrency Currency { get; set; }
-        //internal CoinbaseBalance Balance { get; set; }
+        public float Amount { get; set; }
     }
 
-    internal class CoinbaseBalance
+    public class CoinbaseWallet
     {
-        internal decimal Amount { get; set; }
-        internal string Currency { get; set; }
-    }
-    internal class CoinbaseCurrency
-    {
-        internal string Code { get; set; }
-        internal string Name { get; set; }
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public bool Primary { get; set; }
+        public WalletType Type { get; set; }
+        public CoinbaseCurrency Currency { get; set; }
+        public CoinbaseBalance Balance { get; set; }
+        public DateTime Created_At { get; set; }
+        public DateTime Updated_At { get; set; }
+        public string Resource { get; set; }
+        public string Resource_Path { get; set; }
     }
 
-    internal enum WalletType
+    public class CoinbaseBalance
+    {
+        public decimal Amount { get; set; }
+        public string Currency { get; set; }
+    }
+    public class CoinbaseCurrency
+    {
+        public string Code { get; set; }
+        public string Name { get; set; }
+        public string Color { get; set; }
+        public int Exponent { get; set; }
+        public CoinbaseCurrencyType Type { get; set; }
+        public string Address_Regex { get; set; }
+    }
+
+    public enum CoinbaseCurrencyType
+    {
+        Fiat,
+        Crypto
+    }
+
+    public enum WalletType
     {
         Fiat,
         Wallet
     }
 
-    internal class CoinbaseExchangeRate
+    public class CoinbaseExchangeRate
     {
-        internal string Currency { get; set; }
-        internal Dictionary<string, float> Rates { get; set; }
+        public string Currency { get; set; }
+        public Dictionary<string, float> Rates { get; set; }
     }
 
-    internal class CoinbaseTransaction
+    public class CoinbaseTransaction
     {
-        internal string Id { get; set; }
-        internal CoinbaseTransactionTypes Type { get; set; }
-        internal CoinbaseTransactionStatus Status { get; set; }
-        internal CoinbaseBalance Amount { get; set; }
-        internal CoinbaseBalance Native_Amount { get; set; }
-        //internal CoinbaseBalance Total { get; set; }
-        //internal CoinbaseBalance Subtotal { get; set; }
-        //internal string Description { get; set; }
-        internal DateTime Created_At { get; set; }
-        internal DateTime Updated_At { get; set; }
-        internal DateTime Payout_At { get; set; }
-        internal CoinbaseBuy Buy { get; set; }
-        internal object From { get; set; }
-        internal object To { get; set; }
-        internal CoinbaseBuy Fiat_Deposit { get; set; }
-        internal CoinbaseDetails Details { get; set; }
-       
+        public string Id { get; set; }
+        public CoinbaseTransactionTypes Type { get; set; }
+        public CoinbaseTransactionStatus Status { get; set; }
+        public CoinbaseBalance Amount { get; set; }
+        public CoinbaseBalance Native_Amount { get; set; }
+        public CoinbaseBalance Total { get; set; }
+        public CoinbaseBalance Subtotal { get; set; }
+        public string Description { get; set; }
+        public DateTime Created_At { get; set; }
+        public DateTime Updated_At { get; set; }
+        public DateTime Payout_At { get; set; }
+        public CoinbaseBuy Buy { get; set; }
+        public object From { get; set; }
+        public object To { get; set; }
+        public CoinbaseBuy Fiat_Deposit { get; set; }
+        public CoinbaseDetails Details { get; set; }
+        public string Resource { get; set; }
+        public string Resource_Path { get; set; }
+        public bool Instant_Exchange { get; set; }
+        public CoinbaseNetwork Network { get; set; }
     }
 
-    internal class CoinbaseDetails
+    public class CoinbaseNetwork
     {
-        internal string Title { get; set; }
-        internal string SubTitle { get; set; }
-        internal string Payment_Method_Name { get; set; }
+        public string Hash { get; set; }
+        public CoinbaseTransactionStatus Status { get; set; }
     }
 
-    internal class CoinbaseBuy
+    public class CoinbaseDetails
     {
-        //internal CoinbasePaymentMethod Payment_Method { get; set; }
-        internal CoinbaseBalance Fee { get; set; }
-        internal CoinbaseBalance Amount { get; set; }
-        //internal CoinbaseBalance Total { get; set; }
-        internal CoinbaseBalance Subtotal { get; set; }
+        public string Title { get; set; }
+        public string SubTitle { get; set; }
+        public string Payment_Method_Name { get; set; }
     }
 
-    internal class CoinbasePaymentMethod
+    public class CoinbaseBuy
     {
-        internal string Id { get; set; }
-        internal string Resource { get; set; }
-        internal string Resource_Path { get; set; }
+        public string Id { get; set; }
+        public CoinbasePaymentMethod Payment_Method { get; set; }
+        public CoinbaseBalance Fee { get; set; }
+        public CoinbaseBalance Amount { get; set; }
+        //public CoinbaseBalance Total { get; set; }
+        public CoinbaseBalance Subtotal { get; set; }
     }
 
-    internal enum CoinbaseTransactionStatus
+    public class CoinbasePaymentMethod
+    {
+        public string Id { get; set; }
+        public string Resource { get; set; }
+        public string Resource_Path { get; set; }
+    }
+
+    public enum CoinbaseTransactionStatus
     {
         Pending,
         Completed,
-        Canceled
+        Canceled,
+        Confirmed,
+        Off_Blockchain // Ex. Gift from Coinbase
     }
 
-    internal enum CoinbaseTransactionTypes
+    public enum CoinbaseTransactionTypes
     {
         Buy,
         Sell,
