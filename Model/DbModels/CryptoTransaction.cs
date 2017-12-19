@@ -14,6 +14,7 @@ namespace Model.DbModels
         {
             var t = new CryptoTransaction()
             {
+                Type = TransactionType.Trade,
                 TransactionKey = transactionKey,
                 DateTime = dateTime,
                 ExchangeId = exchangeId,
@@ -34,6 +35,7 @@ namespace Model.DbModels
         {
             var t = new CryptoTransaction()
             {
+                Type = TransactionType.In,
                 TransactionKey = transactionKey,
                 DateTime = dateTime,
                 ExchangeId = exchangeId,
@@ -51,6 +53,7 @@ namespace Model.DbModels
         {
             var t = new CryptoTransaction()
             {
+                Type = TransactionType.Out,
                 TransactionKey = transactionKey,
                 DateTime = dateTime,
                 ExchangeId = exchangeId,
