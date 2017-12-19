@@ -28,7 +28,7 @@ namespace Plugins.Importers.Coinbase
 
             // 1. Get all Wallets
             //var wallets = await ExecuteCoinbaseGet<CoinbaseWallet[]>("/v2/accounts");
-            var wallets = await ExecuteCoinbaseGet<IEnumerable<CoinbaseWallet>>("/v2/accounts");
+            var wallets = await ExecuteCoinbaseGet<IEnumerable<CoinbaseWallet>>("/v2/accounts?limit=100&");
             await Task.Delay(1000);
 
             // 2. Query all Wallets
@@ -67,7 +67,7 @@ namespace Plugins.Importers.Coinbase
             switch (transaction.Type)
             {
                 case CoinbaseTransactionTypes.Buy:
-                    return CryptoTransaction.NewTrade(transaction.Id, transaction.Created_At, exchangeId, transaction.Details.Title + " " + transaction.Details.SubTitle,
+                    return CryptoTransaction.NewTrade(transaction.Buy.User_Reference, transaction.Created_At, exchangeId, transaction.Details.Title + " " + transaction.Details.SubTitle,
                         transaction.Buy.Amount.Amount,
                         transaction.Buy.Amount.Currency,
                         transaction.Buy.Fee.Amount,
@@ -100,7 +100,7 @@ namespace Plugins.Importers.Coinbase
                     if (transaction.To == null)
                     {
                         // Is Receiving
-                        return CryptoTransaction.NewIn(transaction.Id, transaction.Created_At, exchangeId,
+                        return CryptoTransaction.NewIn(transaction.Network.Hash, transaction.Created_At, exchangeId,
                             transaction.Details.Title + " " + transaction.Details.SubTitle,
                             transaction.Amount.Amount,
                             transaction.Amount.Currency,
@@ -111,7 +111,7 @@ namespace Plugins.Importers.Coinbase
                     else
                     {
                         // Is Sending
-                        return CryptoTransaction.NewOut(transaction.Id, transaction.Created_At, exchangeId,
+                        return CryptoTransaction.NewOut(transaction.Network.Hash, transaction.Created_At, exchangeId,
                             transaction.Details.Title + " " + transaction.Details.SubTitle,
                             transaction.Network.Transaction_Amount.Amount,
                             transaction.Network.Transaction_Amount.Currency,
@@ -124,7 +124,7 @@ namespace Plugins.Importers.Coinbase
                     }
 
                 case CoinbaseTransactionTypes.Fiat_Deposit:
-                    return CryptoTransaction.NewIn(transaction.Id, transaction.Created_At, exchangeId,
+                    return CryptoTransaction.NewIn(transaction.Fiat_Deposit.User_Reference, transaction.Created_At, exchangeId,
                         transaction.Details.Title + " " + transaction.Details.SubTitle,
                         transaction.Fiat_Deposit.Amount.Amount,
                         transaction.Fiat_Deposit.Amount.Currency,

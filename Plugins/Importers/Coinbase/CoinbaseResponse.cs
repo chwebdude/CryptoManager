@@ -134,6 +134,8 @@ namespace Plugins.Importers.Coinbase
         public CoinbaseBalance Amount { get; set; }
         //public CoinbaseBalance Total { get; set; }
         public CoinbaseBalance Subtotal { get; set; }
+
+        public string User_Reference { get; set; }
     }
 
     public class CoinbasePaymentMethod
