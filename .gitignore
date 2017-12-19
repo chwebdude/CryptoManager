@@ -263,3 +263,4 @@ __pycache__/
 
 # Crypto Manager generated files
 crypto.db
+/CryptoManager/crypto.db-journal
