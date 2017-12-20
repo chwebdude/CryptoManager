@@ -29,20 +29,26 @@
                 </li>
 
                 <li [routerLinkActive]="['link-active']">
+                    <a [routerLink]="['/funds']">
+                        <span class='glyphicon fa fa-money'></span> Funds
+                    </a>
+                </li>
+
+                <li [routerLinkActive]="['link-active']">
                     <a [routerLink]="['/exchanges']">
                         <span class="glyphicon glyphicon-transfer"></span> Exchanges
                     </a>
                 </li>
-                
+
                 <li>
                     <a (click)="recalculate()" href="javascript:void(0)">
                         <span class="glyphicon glyphicon-refresh"></span> Recalculate
                     </a>
                 </li>
-                
+
                 <li>
-                  <span *ngIf="backgroundTasks > 1" class="badge">{{backgroundTasks}} Background tasks</span>
-                  <span *ngIf="backgroundTasks == 1" class="badge">{{backgroundTasks}} Background task</span>
+                    <span *ngIf="backgroundTasks > 1" class="badge">{{backgroundTasks}} Background tasks</span>
+                    <span *ngIf="backgroundTasks == 1" class="badge">{{backgroundTasks}} Background task</span>
                 </li>
             </ul>
         </div>
