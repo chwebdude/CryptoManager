@@ -33,6 +33,11 @@
                         <span class="glyphicon glyphicon-transfer"></span> Exchanges
                     </a>
                 </li>
+                
+                <li>
+                  <span *ngIf="backgroundTasks > 1" class="badge">{{backgroundTasks}} Background tasks</span>
+                  <span *ngIf="backgroundTasks == 1" class="badge">{{backgroundTasks}} Background task</span>
+                </li>
             </ul>
         </div>
     </div>
