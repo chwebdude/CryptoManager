@@ -54,13 +54,9 @@
     </Content>
   </ItemGroup>
 
-  <Target Name="UpdateYarnPackages" BeforeTargets="Build">
-    <Exec Command="node --version" ContinueOnError="false" />
-    <Exec Command="npm -v" ContinueOnError="false" />
-    <Exec Command="yarn" />
-  </Target>
 
-  <Target Name="DebugRunWebpack" BeforeTargets="Build" AfterTargets="UpdateYarnPackages" Condition=" '$(Configuration)' == 'Debug' And !Exists('wwwroot\dist') ">
+
+  <Target Name="DebugRunWebpack" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('wwwroot\dist') ">
     <!-- Ensure Node.js is installed -->
     <Exec Command="node --version" ContinueOnError="true">
       <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,8 @@ using Model.Meta;
 using Newtonsoft.Json;
 using NLog;
 using RestSharp;
+using RestSharp.Portable;
+using RestSharp.Portable.HttpClient;
 using Exchange = Model.DbModels.Exchange;
 
 namespace Plugins.Importers.Coinbase
@@ -18,7 +21,7 @@ namespace Plugins.Importers.Coinbase
         private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
         private string _apiSecret;
         private string _apiKey;
-        private const string ApiVersion = "2017-12-18";
+        private const string ApiVersion = "2017-08-07";
 
         public async Task<IEnumerable<CryptoTransaction>> GetTransactions(Exchange exchange)
         {
@@ -28,7 +31,7 @@ namespace Plugins.Importers.Coinbase
 
             // 1. Get all Wallets
             //var wallets = await ExecuteCoinbaseGet<CoinbaseWallet[]>("/v2/accounts");
-            var wallets = await ExecuteCoinbaseGet<IEnumerable<CoinbaseWallet>>("/v2/accounts?limit=100&");
+            var wallets = await ExecuteCoinbaseGet<IEnumerable<CoinbaseWallet>>("/v2/accounts");
             await Task.Delay(1000);
 
             // 2. Query all Wallets
@@ -165,6 +168,7 @@ namespace Plugins.Importers.Coinbase
         private async Task<T> ExecuteCoinbaseGet<T>(string requestPath)
         {
             var client = new RestClient("https://api.coinbase.com/");
+
             var request = new RestRequest(requestPath);
             Logger.Trace("GET {0}", requestPath);
             var unixTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds();
@@ -181,29 +185,43 @@ namespace Plugins.Importers.Coinbase
                 request.AddHeader("CB-ACCESS-TIMESTAMP", unixTimestamp.ToString());
                 request.AddHeader("CB-VERSION", ApiVersion);
 
-                var res = await client.ExecuteTaskAsync(request);
+                var res = await client.Execute(request);
+                if (res.IsSuccess)
+                {
+                    var content = JsonConvert.DeserializeObject<CoinbaseResponse<T>>(res.Content/*, settings*/);
+
+                    if (content.Errors != null)
+                    {
+                        foreach (var message in content.Errors)
+                        {
+                            //Todo: Log error
+                            Logger.Error(message);
+                        }
+
+                    }
+                    return content.Data;
+                }
+                else
+                {
+                    Logger.Error(res.StatusDescription);
+                    throw new NetworkInformationException();
+                }
 
                 //var settings = new JsonSerializerSettings()
                 //{
                 //    NullValueHandling = NullValueHandling.Ignore,
                 //    MissingMemberHandling = MissingMemberHandling.Error,                    
                 //};
-                var content = JsonConvert.DeserializeObject<CoinbaseResponse<T>>(res.Content/*, settings*/);
 
-                if (content.Errors != null)
-                {
-                    foreach (var message in content.Errors)
-                    {
-                        //Todo: Log error
-                        Logger.Error(message);
-                    }
-
-                }
-                return content.Data;
             }
         }
 
 
-
+        //public static async Task<RestResponse> ExecuteAsync(this RestClient client, RestRequest request)
+        //{
+        //    TaskCompletionSource<IRestResponse> taskCompletion = new TaskCompletionSource<IRestResponse>();
+        //    RestRequestAsyncHandle handle = client.ExecuteAsync(request, r => taskCompletion.SetResult(r));
+        //    return (RestResponse)(await taskCompletion.Task);
+        //}
     }
 }
