@@ -11,6 +11,24 @@ namespace Plugins.Importers.Coinbase
         public CoinbasePagination Pagination { get; set; }
     }
 
+    public class CoinbasePaymentMethodDetail
+    {
+        public CoinbasePaymentMethodType Type { get; set; }
+    }
+
+    public enum CoinbasePaymentMethodType
+    {
+        ach_bank_account,
+        sepa_bank_account,
+        ideal_bank_account,
+        fiat_account,
+        bank_wire,
+        credit_card,
+        secure3d_card,
+        eft_bank_account,
+        interac
+    }
+
     public class CoinbasePagination
     {
         public string Ending_Before { get; set; }

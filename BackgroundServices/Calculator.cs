@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using CryptoManager.Models;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Model.DbModels;
+using Model.Enums;
 
 namespace BackgroundServices
 {
     public class Calculator
     {
         private readonly CryptoContext _context;
+        private static readonly string[] FiatCurrencies = { "EUR", "CHF", "USD" };
 
         public Calculator(CryptoContext context)
         {
@@ -21,6 +21,9 @@ namespace BackgroundServices
         {
             var transactions = _context.Transactions;
             var wallets = new Dictionary<Guid, Dictionary<string, decimal>>();
+            var fiatInvestments = new Dictionary<string, decimal>();
+            var fiatPayouts = new Dictionary<string, decimal>();
+
 
             foreach (var transaction in transactions)
             {
@@ -29,7 +32,7 @@ namespace BackgroundServices
 
                 switch (transaction.Type)
                 {
-                    case Model.Enums.TransactionType.Trade:
+                    case TransactionType.Trade:
                         // Add Buy Amount
                         if (exchangeWallets.ContainsKey(transaction.BuyCurrency))
                         {
@@ -60,9 +63,22 @@ namespace BackgroundServices
                             exchangeWallets.Add(transaction.FeeCurrency, -transaction.FeeAmount);
                         }
 
+                        // Is this a direct fiat investment?
+                        if (FiatCurrencies.Contains(transaction.SellCurrency) && !transaction.TradeWithWallet)
+                        {
+                            if (fiatInvestments.ContainsKey(transaction.SellCurrency))
+                            {
+                                fiatInvestments[transaction.SellCurrency] += transaction.SellAmount;
+                            }
+                            else
+                            {
+                                fiatInvestments.Add(transaction.SellCurrency, transaction.SellAmount);
+                            }
+                        }
+
 
                         break;
-                    case Model.Enums.TransactionType.In:
+                    case TransactionType.In:
                         if (exchangeWallets.ContainsKey(transaction.InCurrency))
                         {
                             exchangeWallets[transaction.InCurrency] += transaction.InAmount;
@@ -72,8 +88,21 @@ namespace BackgroundServices
                             exchangeWallets.Add(transaction.InCurrency, transaction.InAmount);
                         }
 
+                        // Is this a Fiat 
+                        if (FiatCurrencies.Contains(transaction.InCurrency))
+                        {
+                            if (fiatInvestments.ContainsKey(transaction.InCurrency))
+                            {
+                                fiatInvestments[transaction.InCurrency] += transaction.InAmount;
+                            }
+                            else
+                            {
+                                fiatInvestments.Add(transaction.InCurrency, transaction.InAmount);
+                            }
+                        }
+
                         break;
-                    case Model.Enums.TransactionType.Out:
+                    case TransactionType.Out:
                         if (exchangeWallets.ContainsKey(transaction.OutCurrency))
                         {
                             exchangeWallets[transaction.OutCurrency] -= (transaction.OutAmount + transaction.FeeAmount);
@@ -82,6 +111,20 @@ namespace BackgroundServices
                         {
                             exchangeWallets.Add(transaction.OutCurrency, -(transaction.InAmount + transaction.FeeAmount));
                         }
+
+                        // Is this a Fiat 
+                        if (FiatCurrencies.Contains(transaction.OutCurrency))
+                        {
+                            if (fiatPayouts.ContainsKey(transaction.OutCurrency))
+                            {
+                                fiatPayouts[transaction.OutCurrency] += transaction.OutAmount;
+                            }
+                            else
+                            {
+                                fiatPayouts.Add(transaction.OutCurrency, transaction.OutAmount);
+                            }
+                        }
+
                         break;
                 }
                 wallets[transaction.ExchangeId] = exchangeWallets;
@@ -97,10 +140,10 @@ namespace BackgroundServices
                     var currency = w.Key;
                     var amount = w.Value;
 
-                   var entity= _context.Funds.SingleOrDefault(f => f.ExchangeId == exchangeId && f.Currency == currency);
+                    var entity = _context.Funds.SingleOrDefault(f => f.ExchangeId == exchangeId && f.Currency == currency);
                     if (entity == null)
                     {
-                        _context.Funds.Add(new Fund()
+                        _context.Funds.Add(new Fund
                         {
                             ExchangeId = exchangeId,
                             Currency = currency,

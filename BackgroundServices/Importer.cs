@@ -19,7 +19,7 @@ namespace BackgroundServices
             _context = context;
         }
 
-        public async Task Import(Guid exchangeId)
+        public async Task Import(Guid exchangeId, bool recalculate)
         {
             var exchange = _context.Exchanges.Find(exchangeId);
             var importer = GetImporter(exchange.ExchangeId);
@@ -36,6 +36,9 @@ namespace BackgroundServices
                     _context.SaveChanges();
                 }
             }
+
+            if (recalculate)
+                BackgroundJob.Enqueue<Calculator>(c => c.RecalculateAll());
         }
 
 
@@ -44,7 +47,7 @@ namespace BackgroundServices
             var exchanges = _context.Exchanges;
             foreach (var exchange in exchanges)
             {
-                await Import(exchange.Id);
+                await Import(exchange.Id, false);
             }
 
             BackgroundJob.Enqueue<Calculator>(c => c.RecalculateAll());

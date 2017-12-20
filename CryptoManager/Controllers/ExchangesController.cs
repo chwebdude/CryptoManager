@@ -82,7 +82,7 @@ namespace CryptoManager.Controllers
             await _cryptoContext.SaveChangesAsync();
 
             // Schedule import
-            BackgroundJob.Enqueue<Importer>(i => i.Import(value.Id));
+            BackgroundJob.Enqueue<Importer>(i => i.Import(value.Id, true));
         }
 
         [HttpDelete]
@@ -94,6 +94,17 @@ namespace CryptoManager.Controllers
 
             _cryptoContext.Exchanges.Remove(obj);
             await _cryptoContext.SaveChangesAsync();
+            return Ok();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateExchange(Guid id)
+        {
+            // Check if exchange exits
+            var entity = await _cryptoContext.Exchanges.FindAsync(id);
+            if (entity == null)
+                return NotFound();
+            BackgroundJob.Enqueue<Importer>(i => i.Import(id, true));
             return Ok();
         }
     }
