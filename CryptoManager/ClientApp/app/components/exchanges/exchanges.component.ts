@@ -80,7 +80,12 @@ export class ExchangesComponent implements OnInit {
         this.apiClient.apiExchangesDelete((exchange.id) as string).subscribe(() => this.refreshOwnExchanges());
       }
     });
+  }
 
+  update(exchange: ExchangeDto) {
+    console.info("Updating...");
+    this.apiClient.apiExchangesUpdatePost(String(exchange.id))
+      .subscribe();
   }
 }
 

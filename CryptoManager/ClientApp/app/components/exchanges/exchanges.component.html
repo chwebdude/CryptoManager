@@ -39,6 +39,11 @@
 <p-dataTable [value]="ownExchanges">
     <p-column field="exchangeName" header="Exchange"></p-column>
     <p-column field="comment" header="Comment"></p-column>
+    <p-column styleClass="col-button" header="Update" [style]="{'width': '88px'}">
+        <ng-template let-exchange="rowData" pTemplate="body">
+            <button type="button" pButton (click)="update(exchange)" label="Update"></button>
+        </ng-template>
+    </p-column>
     <p-column styleClass="col-button" header="Remove" [style]="{'width': '80px'}">
         <ng-template let-exchange="rowData" pTemplate="body">
             <button type="button" pButton (click)="remove(exchange)" icon="fa-trash"></button>
