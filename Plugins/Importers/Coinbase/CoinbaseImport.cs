@@ -43,7 +43,7 @@ namespace Plugins.Importers.Coinbase
                 foreach (var transaction in transactions)
                 {
                     var crypto = MappTransaction(transaction, exchange.Id);
-                    cryptoTransactions.Add(crypto);
+                    cryptoTransactions.Add(await crypto);
                 }
                 await Task.Delay(2000);
             }
@@ -64,19 +64,34 @@ namespace Plugins.Importers.Coinbase
 
         public Model.Enums.Exchange Exchange => Model.Enums.Exchange.Coinbase;
 
-        private CryptoTransaction MappTransaction(CoinbaseTransaction transaction, Guid exchangeId)
+        private static Dictionary<string, bool> IsCreditcardPaymentCache = new Dictionary<string, bool>();
+        private async Task<bool> IsCreditcardPayment(string paymentMethodId)
+        {
+            if (IsCreditcardPaymentCache.ContainsKey(paymentMethodId))
+                return IsCreditcardPaymentCache[paymentMethodId];
+
+            var pm = await ExecuteCoinbaseGet<CoinbasePaymentMethodDetail>("/v2/payment-methods/" + paymentMethodId);
+            var res = pm.Type == CoinbasePaymentMethodType.credit_card ||
+                      pm.Type == CoinbasePaymentMethodType.secure3d_card;
+            IsCreditcardPaymentCache.Add(paymentMethodId, res);
+            return res;
+        }
+
+        private async Task<CryptoTransaction> MappTransaction(CoinbaseTransaction transaction, Guid exchangeId)
         {
 
             switch (transaction.Type)
             {
                 case CoinbaseTransactionTypes.Buy:
+
                     return CryptoTransaction.NewTrade(transaction.Buy.User_Reference, transaction.Created_At, exchangeId, transaction.Details.Title + " " + transaction.Details.SubTitle,
                         transaction.Buy.Amount.Amount,
                         transaction.Buy.Amount.Currency,
                         transaction.Buy.Fee.Amount,
                         transaction.Buy.Fee.Currency,
                         transaction.Buy.Subtotal.Amount,
-                        transaction.Buy.Subtotal.Currency);
+                        transaction.Buy.Subtotal.Currency,
+                     await IsCreditcardPayment(transaction.Buy.Payment_Method.Id));
 
 
                 //case CoinbaseTransactionTypes.Sell:
@@ -188,7 +203,7 @@ namespace Plugins.Importers.Coinbase
                 var res = await client.Execute(request);
                 if (res.IsSuccess)
                 {
-                    var content = JsonConvert.DeserializeObject<CoinbaseResponse<T>>(res.Content/*, settings*/);
+                    var content = JsonConvert.DeserializeObject<CoinbaseResponse<T>>(res.Content);
 
                     if (content.Errors != null)
                     {
@@ -207,21 +222,7 @@ namespace Plugins.Importers.Coinbase
                     throw new NetworkInformationException();
                 }
 
-                //var settings = new JsonSerializerSettings()
-                //{
-                //    NullValueHandling = NullValueHandling.Ignore,
-                //    MissingMemberHandling = MissingMemberHandling.Error,                    
-                //};
-
             }
         }
-
-
-        //public static async Task<RestResponse> ExecuteAsync(this RestClient client, RestRequest request)
-        //{
-        //    TaskCompletionSource<IRestResponse> taskCompletion = new TaskCompletionSource<IRestResponse>();
-        //    RestRequestAsyncHandle handle = client.ExecuteAsync(request, r => taskCompletion.SetResult(r));
-        //    return (RestResponse)(await taskCompletion.Task);
-        //}
     }
 }
