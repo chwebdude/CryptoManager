@@ -15,6 +15,7 @@ import { NavMenuComponent } from './components/navmenu/navmenu.component';
 import { HomeComponent } from './components/home/home.component';
 import { ExchangesComponent } from './components/exchanges/exchanges.component';
 import { TransactionsComponent } from './components/transactions/transactions.component';
+import { FundsComponent } from './components/funds/funds.component';
 
 import { CryptoApiClient } from './services/api-client';
 
@@ -25,7 +26,7 @@ import { CryptoApiClient } from './services/api-client';
     HomeComponent,
     ExchangesComponent,
     TransactionsComponent,
-    
+    FundsComponent
   ],
   imports: [
     CommonModule,
@@ -46,6 +47,7 @@ import { CryptoApiClient } from './services/api-client';
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', component: HomeComponent },
       { path: 'transactions', component: TransactionsComponent },
+      { path: 'funds', component: FundsComponent },
       { path: 'exchanges', component: ExchangesComponent },
       { path: '**', redirectTo: 'home' }
     ])
