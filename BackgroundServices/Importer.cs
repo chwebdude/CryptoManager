@@ -31,12 +31,11 @@ namespace BackgroundServices
                 var row = _context.Transactions.SingleOrDefault(t =>
                     t.ExchangeId == exchangeId && t.TransactionKey == transaction.TransactionKey);
                 if (row == null)
+                {
                     _context.Transactions.Add(transaction);
+                    _context.SaveChanges();
+                }
             }
-            
-
-        
-            _context.SaveChanges();
         }
 
 
