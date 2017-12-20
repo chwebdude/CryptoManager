@@ -111,7 +111,7 @@ namespace CryptoManager
                     defaults: new { controller = "Home", action = "Index" });
             });
 
-            BackgroundJob.Enqueue<Importer>(i => i.ImportAll());
+            //BackgroundJob.Enqueue<Importer>(i => i.ImportAll());
             //BackgroundJob.Enqueue<Calculator>(c => c.RecalculateAll());
 
         }
