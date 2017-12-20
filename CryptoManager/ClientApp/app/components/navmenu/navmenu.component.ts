@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from "rxjs";
 import { IntervalObservable } from "rxjs/observable/IntervalObservable";
+import { CryptoApiClient } from '../../services/api-client';
 
 
 @Component({
@@ -13,7 +14,7 @@ export class NavMenuComponent {
   httpParams: string;
   backgroundTasks :number;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private client: CryptoApiClient) { }
 
 
   ngOnInit() {
@@ -40,6 +41,10 @@ export class NavMenuComponent {
         headers: new HttpHeaders()
           .set('Content-Type', 'application/x-www-form-urlencoded')
       });
+  }
+
+  recalculate(): void {
+    this.client.apiTransactionsRecalculatePost().subscribe();
   }
 }
 
