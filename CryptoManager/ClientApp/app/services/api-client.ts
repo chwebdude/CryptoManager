@@ -250,6 +250,58 @@ export class CryptoApiClient {
     /**
      * @return Success
      */
+    apiExchangesUpdatePost(id: string): Observable<void> {
+        let url_ = this.baseUrl + "/api/Exchanges/update?";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined and cannot be null.");
+        else
+            url_ += "id=" + encodeURIComponent("" + id) + "&"; 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+            })
+        };
+
+        return this.http.request("post", url_, options_).flatMap((response_ : any) => {
+            return this.processApiExchangesUpdatePost(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processApiExchangesUpdatePost(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<void>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processApiExchangesUpdatePost(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            response instanceof HttpErrorResponse ? response.error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).flatMap(_responseText => {
+            return Observable.of<void>(<any>null);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<void>(<any>null);
+    }
+
+    /**
+     * @return Success
+     */
     apiTransactionsGet(): Observable<CryptoTransaction[]> {
         let url_ = this.baseUrl + "/api/Transactions";
         url_ = url_.replace(/[?&]$/, "");
@@ -458,26 +510,27 @@ export interface IExchange {
 }
 
 export class CryptoTransaction implements ICryptoTransaction {
-    id?: string | undefined;
-    type?: CryptoTransactionType | undefined;
-    dateTime?: Date | undefined;
-    inAmount?: number | undefined;
-    inCurrency?: string | undefined;
-    inAdress?: string | undefined;
-    outAmount?: number | undefined;
-    outCurrency?: string | undefined;
-    outAdress?: string | undefined;
-    feeAmount?: number | undefined;
-    feeCurrency?: string | undefined;
-    buyAmount?: number | undefined;
-    buyCurrency?: string | undefined;
-    sellAmount?: number | undefined;
-    sellCurrency?: string | undefined;
-    rate?: number | undefined;
-    exchangeId?: string | undefined;
-    comment?: string | undefined;
-    transactionKey?: string | undefined;
-    transactionHash?: string | undefined;
+    readonly id?: string | undefined;
+    readonly type?: CryptoTransactionType | undefined;
+    readonly dateTime?: Date | undefined;
+    readonly inAmount?: number | undefined;
+    readonly inCurrency?: string | undefined;
+    readonly outAmount?: number | undefined;
+    readonly outCurrency?: string | undefined;
+    readonly feeAmount?: number | undefined;
+    readonly feeCurrency?: string | undefined;
+    readonly buyAmount?: number | undefined;
+    readonly buyCurrency?: string | undefined;
+    readonly sellAmount?: number | undefined;
+    readonly sellCurrency?: string | undefined;
+    readonly rate?: number | undefined;
+    fromAddress?: string | undefined;
+    toAddress?: string | undefined;
+    readonly exchangeId?: string | undefined;
+    readonly comment?: string | undefined;
+    readonly transactionKey?: string | undefined;
+    readonly transactionHash?: string | undefined;
+    tradeWithWallet?: boolean | undefined;
 
     constructor(data?: ICryptoTransaction) {
         if (data) {
@@ -490,26 +543,27 @@ export class CryptoTransaction implements ICryptoTransaction {
 
     init(data?: any) {
         if (data) {
-            this.id = data["id"];
-            this.type = data["type"];
-            this.dateTime = data["dateTime"] ? new Date(data["dateTime"].toString()) : <any>undefined;
-            this.inAmount = data["inAmount"];
-            this.inCurrency = data["inCurrency"];
-            this.inAdress = data["inAdress"];
-            this.outAmount = data["outAmount"];
-            this.outCurrency = data["outCurrency"];
-            this.outAdress = data["outAdress"];
-            this.feeAmount = data["feeAmount"];
-            this.feeCurrency = data["feeCurrency"];
-            this.buyAmount = data["buyAmount"];
-            this.buyCurrency = data["buyCurrency"];
-            this.sellAmount = data["sellAmount"];
-            this.sellCurrency = data["sellCurrency"];
-            this.rate = data["rate"];
-            this.exchangeId = data["exchangeId"];
-            this.comment = data["comment"];
-            this.transactionKey = data["transactionKey"];
-            this.transactionHash = data["transactionHash"];
+            (<any>this).id = data["id"];
+            (<any>this).type = data["type"];
+            (<any>this).dateTime = data["dateTime"] ? new Date(data["dateTime"].toString()) : <any>undefined;
+            (<any>this).inAmount = data["inAmount"];
+            (<any>this).inCurrency = data["inCurrency"];
+            (<any>this).outAmount = data["outAmount"];
+            (<any>this).outCurrency = data["outCurrency"];
+            (<any>this).feeAmount = data["feeAmount"];
+            (<any>this).feeCurrency = data["feeCurrency"];
+            (<any>this).buyAmount = data["buyAmount"];
+            (<any>this).buyCurrency = data["buyCurrency"];
+            (<any>this).sellAmount = data["sellAmount"];
+            (<any>this).sellCurrency = data["sellCurrency"];
+            (<any>this).rate = data["rate"];
+            this.fromAddress = data["fromAddress"];
+            this.toAddress = data["toAddress"];
+            (<any>this).exchangeId = data["exchangeId"];
+            (<any>this).comment = data["comment"];
+            (<any>this).transactionKey = data["transactionKey"];
+            (<any>this).transactionHash = data["transactionHash"];
+            this.tradeWithWallet = data["tradeWithWallet"];
         }
     }
 
@@ -526,10 +580,8 @@ export class CryptoTransaction implements ICryptoTransaction {
         data["dateTime"] = this.dateTime ? this.dateTime.toISOString() : <any>undefined;
         data["inAmount"] = this.inAmount;
         data["inCurrency"] = this.inCurrency;
-        data["inAdress"] = this.inAdress;
         data["outAmount"] = this.outAmount;
         data["outCurrency"] = this.outCurrency;
-        data["outAdress"] = this.outAdress;
         data["feeAmount"] = this.feeAmount;
         data["feeCurrency"] = this.feeCurrency;
         data["buyAmount"] = this.buyAmount;
@@ -537,10 +589,13 @@ export class CryptoTransaction implements ICryptoTransaction {
         data["sellAmount"] = this.sellAmount;
         data["sellCurrency"] = this.sellCurrency;
         data["rate"] = this.rate;
+        data["fromAddress"] = this.fromAddress;
+        data["toAddress"] = this.toAddress;
         data["exchangeId"] = this.exchangeId;
         data["comment"] = this.comment;
         data["transactionKey"] = this.transactionKey;
         data["transactionHash"] = this.transactionHash;
+        data["tradeWithWallet"] = this.tradeWithWallet;
         return data; 
     }
 }
@@ -551,10 +606,8 @@ export interface ICryptoTransaction {
     dateTime?: Date | undefined;
     inAmount?: number | undefined;
     inCurrency?: string | undefined;
-    inAdress?: string | undefined;
     outAmount?: number | undefined;
     outCurrency?: string | undefined;
-    outAdress?: string | undefined;
     feeAmount?: number | undefined;
     feeCurrency?: string | undefined;
     buyAmount?: number | undefined;
@@ -562,10 +615,13 @@ export interface ICryptoTransaction {
     sellAmount?: number | undefined;
     sellCurrency?: string | undefined;
     rate?: number | undefined;
+    fromAddress?: string | undefined;
+    toAddress?: string | undefined;
     exchangeId?: string | undefined;
     comment?: string | undefined;
     transactionKey?: string | undefined;
     transactionHash?: string | undefined;
+    tradeWithWallet?: boolean | undefined;
 }
 
 export enum ExchangeMetaExchangeId {
@@ -584,8 +640,6 @@ export enum CryptoTransactionType {
     _0 = 0, 
     _1 = 1, 
     _2 = 2, 
-    _3 = 3, 
-    _4 = 4, 
 }
 
 export class SwaggerException extends Error {

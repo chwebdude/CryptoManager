@@ -97,7 +97,7 @@ namespace CryptoManager.Controllers
             return Ok();
         }
 
-        [HttpPost]
+        [HttpPost("update")]
         public async Task<IActionResult> UpdateExchange(Guid id)
         {
             // Check if exchange exits
