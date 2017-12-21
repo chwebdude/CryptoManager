@@ -21,14 +21,18 @@ namespace BackgroundServices
         {
             var transactions = _context.Transactions;
             var wallets = new Dictionary<Guid, Dictionary<string, decimal>>();
-            var fiatInvestments = new Dictionary<string, decimal>();
-            var fiatPayouts = new Dictionary<string, decimal>();
-
+            var fiatInvestments = new Dictionary<Guid, Dictionary<string, decimal>>();
+            var fiatPayouts = new Dictionary<Guid, Dictionary<string, decimal>>();
 
             foreach (var transaction in transactions)
             {
                 var exchangeWallets = wallets.ContainsKey(transaction.ExchangeId) ? wallets[transaction.ExchangeId] : new Dictionary<string, decimal>();
-
+                var fiatExchangeInvestments = fiatInvestments.ContainsKey(transaction.ExchangeId)
+                    ? fiatInvestments[transaction.ExchangeId]
+                    : new Dictionary<string, decimal>();
+                var fiatExchangePayouts = fiatPayouts.ContainsKey(transaction.ExchangeId)
+                    ? fiatPayouts[transaction.ExchangeId]
+                    : new Dictionary<string, decimal>();
 
                 switch (transaction.Type)
                 {
@@ -42,6 +46,7 @@ namespace BackgroundServices
                         {
                             exchangeWallets.Add(transaction.BuyCurrency, transaction.BuyAmount);
                         }
+
 
                         // Sub Paying amount
                         if (exchangeWallets.ContainsKey(transaction.SellCurrency))
@@ -62,22 +67,10 @@ namespace BackgroundServices
                         {
                             exchangeWallets.Add(transaction.FeeCurrency, -transaction.FeeAmount);
                         }
-
-                        // Is this a direct fiat investment?
-                        if (FiatCurrencies.Contains(transaction.SellCurrency) && !transaction.TradeWithWallet)
-                        {
-                            if (fiatInvestments.ContainsKey(transaction.SellCurrency))
-                            {
-                                fiatInvestments[transaction.SellCurrency] += transaction.SellAmount;
-                            }
-                            else
-                            {
-                                fiatInvestments.Add(transaction.SellCurrency, transaction.SellAmount);
-                            }
-                        }
-
-
+                        
                         break;
+
+
                     case TransactionType.In:
                         if (exchangeWallets.ContainsKey(transaction.InCurrency))
                         {
@@ -91,13 +84,13 @@ namespace BackgroundServices
                         // Is this a Fiat 
                         if (FiatCurrencies.Contains(transaction.InCurrency))
                         {
-                            if (fiatInvestments.ContainsKey(transaction.InCurrency))
+                            if (fiatExchangeInvestments.ContainsKey(transaction.InCurrency))
                             {
-                                fiatInvestments[transaction.InCurrency] += transaction.InAmount;
+                                fiatExchangeInvestments[transaction.InCurrency] += transaction.InAmount;
                             }
                             else
                             {
-                                fiatInvestments.Add(transaction.InCurrency, transaction.InAmount);
+                                fiatExchangeInvestments.Add(transaction.InCurrency, transaction.InAmount);
                             }
                         }
 
@@ -115,19 +108,21 @@ namespace BackgroundServices
                         // Is this a Fiat 
                         if (FiatCurrencies.Contains(transaction.OutCurrency))
                         {
-                            if (fiatPayouts.ContainsKey(transaction.OutCurrency))
+                            if (fiatExchangePayouts.ContainsKey(transaction.OutCurrency))
                             {
-                                fiatPayouts[transaction.OutCurrency] += transaction.OutAmount;
+                                fiatExchangePayouts[transaction.OutCurrency] += transaction.OutAmount;
                             }
                             else
                             {
-                                fiatPayouts.Add(transaction.OutCurrency, transaction.OutAmount);
+                                fiatExchangePayouts.Add(transaction.OutCurrency, transaction.OutAmount);
                             }
                         }
 
                         break;
                 }
                 wallets[transaction.ExchangeId] = exchangeWallets;
+                fiatInvestments[transaction.ExchangeId] = fiatExchangeInvestments;
+                fiatPayouts[transaction.ExchangeId] = fiatExchangePayouts;
             }
 
 
