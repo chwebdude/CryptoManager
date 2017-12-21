@@ -8,12 +8,14 @@ using Model.DTOs;
 
 namespace CryptoManager
 {
-    public class MappingProfile:Profile
+    public class MappingProfile : Profile
     {
         public MappingProfile()
         {
             CreateMap<Exchange, ExchangeDto>()
                 .ForMember(m => m.ExchangeName, a => a.MapFrom(s => s.ExchangeId.ToString()));
+
+            CreateMap<Fund, FundDTO>();
         }
     }
 }
