@@ -15,6 +15,7 @@ export class FundsComponent implements OnInit {
   }
 
 
+
   ngOnInit() {
     this.apiClient.apiFundsGet().subscribe(res => this.funds = res);
   }
