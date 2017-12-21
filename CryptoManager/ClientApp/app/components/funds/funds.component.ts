@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CryptoApiClient, CryptoTransaction } from '../../services/api-client';
+import { CryptoApiClient, FundDTO } from '../../services/api-client';
 
 
 @Component({
@@ -9,14 +9,14 @@ import { CryptoApiClient, CryptoTransaction } from '../../services/api-client';
 })
 
 export class FundsComponent implements OnInit {
-  
+  funds: FundDTO[];
 
   constructor(private apiClient: CryptoApiClient) {
   }
 
- 
 
   ngOnInit() {
+    this.apiClient.apiFundsGet().subscribe(res => this.funds = res);
   }
  
 }
