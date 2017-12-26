@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Model.DbModels;
+using Model.DTOs;
 
 namespace CryptoManager.Controllers
 {
@@ -23,9 +24,23 @@ namespace CryptoManager.Controllers
 
         // GET: api/FiatBalances
         [HttpGet]
-        public IEnumerable<FiatBalance> Get()
+        public IEnumerable<FiatDTO> Get()
         {
-            return _cryptoContext.FiatBalances;
-        }        
+            foreach (var cryptoContextFiatBalance in _cryptoContext.FiatBalances)
+            {
+                var exchange = _cryptoContext.Exchanges.Find(cryptoContextFiatBalance.ExchangeId);
+                yield return new FiatDTO()
+                {
+
+                    ExchangeId = cryptoContextFiatBalance.ExchangeId,
+                    Currency = cryptoContextFiatBalance.Currency,
+                    ExchangeName = exchange.ExchangeId.ToString(),
+                    Id = cryptoContextFiatBalance.Id,
+                    Invested = cryptoContextFiatBalance.Invested,
+                    Payout = cryptoContextFiatBalance.Payout
+                };
+            }
+
+        }
     }
 }
