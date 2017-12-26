@@ -6,6 +6,7 @@ namespace Model.Enums
 {
     public enum Exchange
     {
-        Coinbase = 1
+        Coinbase = 1,
+        Binance = 2
     }
 }
