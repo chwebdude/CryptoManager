@@ -86,6 +86,24 @@ namespace Model.Migrations
                     b.ToTable("Exchanges");
                 });
 
+            modelBuilder.Entity("Model.DbModels.FiatBalance", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Currency");
+
+                    b.Property<Guid>("ExchangeId");
+
+                    b.Property<decimal>("Invested");
+
+                    b.Property<decimal>("Payout");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FiatBalances");
+                });
+
             modelBuilder.Entity("Model.DbModels.Fund", b =>
                 {
                     b.Property<Guid>("Id")
