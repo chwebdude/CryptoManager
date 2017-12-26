@@ -12,7 +12,7 @@ namespace CryptoManager
     {
         public MappingProfile()
         {
-            CreateMap<Exchange, ExchangeDto>()
+            CreateMap<Exchange, ExchangeDTO>()
                 .ForMember(m => m.ExchangeName, a => a.MapFrom(s => s.ExchangeId.ToString()));
 
             CreateMap<Fund, FundDTO>();
