@@ -21,19 +21,18 @@ namespace BackgroundServices
         {
             var transactions = _context.Transactions;
             var wallets = new Dictionary<Guid, Dictionary<string, decimal>>();
-            var fiatInvestments = new Dictionary<Guid, Dictionary<string, decimal>>();
-            var fiatPayouts = new Dictionary<Guid, Dictionary<string, decimal>>();
+            //var fiatInvestments = new Dictionary<Guid, Dictionary<string, decimal>>();
+            //var fiatPayouts = new Dictionary<Guid, Dictionary<string, decimal>>();
+            var fiatDict = new Dictionary<Guid, Dictionary<string, Fiat>>();
 
             foreach (var transaction in transactions)
             {
                 var exchangeWallets = wallets.ContainsKey(transaction.ExchangeId) ? wallets[transaction.ExchangeId] : new Dictionary<string, decimal>();
-                var fiatExchangeInvestments = fiatInvestments.ContainsKey(transaction.ExchangeId)
-                    ? fiatInvestments[transaction.ExchangeId]
-                    : new Dictionary<string, decimal>();
-                var fiatExchangePayouts = fiatPayouts.ContainsKey(transaction.ExchangeId)
-                    ? fiatPayouts[transaction.ExchangeId]
-                    : new Dictionary<string, decimal>();
+                var fiatEx = fiatDict.ContainsKey(transaction.ExchangeId)
+                    ? fiatDict[transaction.ExchangeId]
+                    : new Dictionary<string, Fiat>();
 
+       
                 switch (transaction.Type)
                 {
                     case TransactionType.Trade:
@@ -67,7 +66,7 @@ namespace BackgroundServices
                         {
                             exchangeWallets.Add(transaction.FeeCurrency, -transaction.FeeAmount);
                         }
-                        
+
                         break;
 
 
@@ -81,16 +80,19 @@ namespace BackgroundServices
                             exchangeWallets.Add(transaction.InCurrency, transaction.InAmount);
                         }
 
-                        // Is this a Fiat 
+                        // Is this a FiatBalance 
                         if (FiatCurrencies.Contains(transaction.InCurrency))
                         {
-                            if (fiatExchangeInvestments.ContainsKey(transaction.InCurrency))
+                            if (fiatEx.ContainsKey(transaction.InCurrency))
                             {
-                                fiatExchangeInvestments[transaction.InCurrency] += transaction.InAmount;
+                                fiatEx[transaction.InCurrency].Investments += transaction.InAmount;
                             }
                             else
                             {
-                                fiatExchangeInvestments.Add(transaction.InCurrency, transaction.InAmount);
+                                fiatEx.Add(transaction.InCurrency, new Fiat
+                                {
+                                   Investments = transaction.InAmount
+                                });
                             }
                         }
 
@@ -105,24 +107,26 @@ namespace BackgroundServices
                             exchangeWallets.Add(transaction.OutCurrency, -(transaction.InAmount + transaction.FeeAmount));
                         }
 
-                        // Is this a Fiat 
+                        // Is this a FiatBalance 
                         if (FiatCurrencies.Contains(transaction.OutCurrency))
                         {
-                            if (fiatExchangePayouts.ContainsKey(transaction.OutCurrency))
+                            if (fiatEx.ContainsKey(transaction.OutCurrency))
                             {
-                                fiatExchangePayouts[transaction.OutCurrency] += transaction.OutAmount;
+                                fiatEx[transaction.OutCurrency].Payouts += transaction.OutAmount;
                             }
                             else
                             {
-                                fiatExchangePayouts.Add(transaction.OutCurrency, transaction.OutAmount);
+                                fiatEx.Add(transaction.OutCurrency, new Fiat()
+                                {
+                                    Payouts = transaction.OutAmount
+                                });
                             }
                         }
 
                         break;
                 }
                 wallets[transaction.ExchangeId] = exchangeWallets;
-                fiatInvestments[transaction.ExchangeId] = fiatExchangeInvestments;
-                fiatPayouts[transaction.ExchangeId] = fiatExchangePayouts;
+                fiatDict[transaction.ExchangeId] = fiatEx;
             }
 
 
@@ -152,9 +156,49 @@ namespace BackgroundServices
                 }
             }
 
+            // Add Fiat Balances
+            foreach (var fiatDic in fiatDict)
+            {
+                foreach (var fiatDictValue in fiatDict.Values)
+                {
+                    var exchangeId = fiatDic.Key;
+                    foreach (var fiat in fiatDictValue)
+                    {
+                        var currency = fiat.Key;
+                        var investment = fiat.Value.Investments;
+                        var payout = fiat.Value.Payouts;
+
+                        var entity = _context.FiatBalances.SingleOrDefault(f =>
+                            f.ExchangeId == exchangeId && f.Currency == currency);
+                        if (entity == null)
+                        {
+                            _context.FiatBalances.Add(new FiatBalance()
+                            {
+                                Currency = currency,
+                                ExchangeId = exchangeId,
+                                Invested = investment,
+                                Payout = payout
+                            });
+                        }
+                        else
+                        {
+                            entity.Invested = investment;
+                            entity.Payout = payout;
+                        }
+                    }
+
+                }
+            }
+
             _context.SaveChanges();
         }
 
+
+        class Fiat
+        {
+            public decimal Investments { get; set; }
+            public decimal Payouts { get; set; }
+        }
 
     }
 }
