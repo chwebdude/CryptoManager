@@ -120,7 +120,7 @@ namespace Plugins.Importers.Binance
                             CryptoTransaction.NewTrade(trade.Id.ToString(), trade.Time, exchange.Id, "Binance Buy",
                                 trade.Quantity, currency2, trade.Commission, trade.CommissionAsset,
                                 trade.Price * trade.Quantity,
-                                currency1, true)
+                                currency1)
                         );
                     }
                     else
@@ -129,7 +129,7 @@ namespace Plugins.Importers.Binance
                         trades.Add(
                         CryptoTransaction.NewTrade(trade.Id.ToString(), trade.Time, exchange.Id, "Binance Sell",
                             trade.Price * trade.Quantity, currency1, trade.Commission, trade.CommissionAsset, trade.Quantity,
-                            currency2, true)
+                            currency2)
                             );
                     }
                 }

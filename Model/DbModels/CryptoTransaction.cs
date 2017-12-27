@@ -23,9 +23,8 @@ namespace Model.DbModels
         /// <param name="feeCurrency"></param>
         /// <param name="sellAmount">Without fee</param>
         /// <param name="sellCurrency"></param>
-        /// <param name="usingWallet"></param>
         /// <returns></returns>
-        public static CryptoTransaction NewTrade(string transactionKey, DateTime dateTime, Guid exchangeId, string comment, decimal buyAmount, string buyCurrency, decimal fee, string feeCurrency, decimal sellAmount, string sellCurrency, bool usingWallet)
+        public static CryptoTransaction NewTrade(string transactionKey, DateTime dateTime, Guid exchangeId, string comment, decimal buyAmount, string buyCurrency, decimal fee, string feeCurrency, decimal sellAmount, string sellCurrency)
         {
             var t = new CryptoTransaction()
             {
