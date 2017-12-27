@@ -6,7 +6,7 @@ using Model.Enums;
 
 namespace Model.DTOs
 {
-    public class ExchangeDto
+    public class ExchangeDTO
     {
         [Key]
         public Guid Id { get; set; }
