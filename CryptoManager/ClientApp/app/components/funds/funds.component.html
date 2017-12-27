@@ -7,3 +7,20 @@
         </ng-template>
     </p-column>    
 </p-dataTable>
+
+<br/>
+<br/>
+<h1>Fiat</h1>
+<p-dataTable [value]="fiat">
+    <p-column field="exchangeName" header="Exchange" [style]="{'width': '180px'}"></p-column>
+    <p-column styleClass="col-button" header="Invested">
+        <ng-template let-fiat="rowData" pTemplate="body">
+            {{fiat.invested}} {{fiat.currency}}
+        </ng-template>
+    </p-column>
+    <p-column styleClass="col-button" header="Payout">
+        <ng-template let-fiat="rowData" pTemplate="body">
+            {{fiat.payout}} {{fiat.currency}}
+        </ng-template>
+    </p-column>
+</p-dataTable>
