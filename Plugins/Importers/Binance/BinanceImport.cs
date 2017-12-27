@@ -17,11 +17,49 @@ namespace Plugins.Importers.Binance
 
         public async Task<IEnumerable<CryptoTransaction>> GetTransactions(Exchange exchange)
         {
-
-
             var client = new BinanceClient(exchange.PublicKey, exchange.PrivateKey);
             var trades = new List<CryptoTransaction>();
+            trades.AddRange(await GetTransactions(client, exchange));
+            trades.AddRange(await GetTrades(client, exchange));
+            
+            return trades;
+        }
 
+        private async Task<IEnumerable<CryptoTransaction>> GetTransactions(BinanceClient client, Exchange exchange)
+        {
+            var transactions = new List<CryptoTransaction>();
+            var deposits = await client.GetDepositHistoryAsync();
+            foreach (var deposit in deposits.Data.List)
+            {
+                transactions.Add(
+                    CryptoTransaction.NewIn(deposit.InsertTime.ToFileTimeUtc().ToString(), deposit.InsertTime, exchange.Id, "Transfered "+deposit.Asset+" to Binance", deposit.Amount, deposit.Asset, string.Empty, string.Empty, string.Empty)
+                    );
+            }
+
+            var withdraws = await client.GetWithdrawHistoryAsync();
+            foreach (var withdrawal in withdraws.Data.List)
+            {
+                transactions.Add(
+                    CryptoTransaction.NewOut(withdrawal.TransactionId, withdrawal.ApplyTime, exchange.Id, "Transfered "+withdrawal.Asset+ " from Binance",
+                    withdrawal.Amount,
+                    withdrawal.Asset,
+                    0,
+                    string.Empty,
+                    string.Empty,
+                    withdrawal.Address,
+                    withdrawal.TransactionId
+                    )
+                    );
+            }
+
+
+            return transactions;
+        }
+
+
+        private async Task<IEnumerable<CryptoTransaction>> GetTrades(BinanceClient client, Exchange exchange)
+        {
+            var trades = new List<CryptoTransaction>();
             var prices = await client.GetAllPricesAsync();
             var counter = 0;
 
@@ -96,9 +134,6 @@ namespace Plugins.Importers.Binance
                     }
                 }
             }
-
-
-
             return trades;
         }
 
