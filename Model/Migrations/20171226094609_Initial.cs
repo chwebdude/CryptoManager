@@ -24,6 +24,21 @@ namespace Model.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "FiatBalances",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    Currency = table.Column<string>(nullable: true),
+                    ExchangeId = table.Column<Guid>(nullable: false),
+                    Invested = table.Column<decimal>(nullable: false),
+                    Payout = table.Column<decimal>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FiatBalances", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Funds",
                 columns: table => new
                 {
@@ -84,6 +99,9 @@ namespace Model.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Exchanges");
+
+            migrationBuilder.DropTable(
+                name: "FiatBalances");
 
             migrationBuilder.DropTable(
                 name: "Funds");

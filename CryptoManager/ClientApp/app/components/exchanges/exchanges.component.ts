@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { SelectItem, ConfirmationService } from 'primeng/primeng';
-import { CryptoApiClient, IExchangeMeta, Exchange, ExchangeDto } from '../../services/api-client';
+import { CryptoApiClient, IExchangeMeta, Exchange, ExchangeDTO } from '../../services/api-client';
 
 
 @Component({
@@ -19,7 +19,7 @@ export class ExchangesComponent implements OnInit {
   comment: string;
   showForm: boolean;
 
-  ownExchanges: ExchangeDto[];
+  ownExchanges: ExchangeDTO[];
 
   constructor(private apiClient: CryptoApiClient, private confirmationService: ConfirmationService) {
 
@@ -67,7 +67,7 @@ export class ExchangesComponent implements OnInit {
   }
 
 
-  remove(exchange: ExchangeDto) {
+  remove(exchange: ExchangeDTO) {
     console.warn("Delete...");
     this.confirmationService.confirm({
       header: 'Delete',
@@ -82,7 +82,7 @@ export class ExchangesComponent implements OnInit {
     });
   }
 
-  update(exchange: ExchangeDto) {
+  update(exchange: ExchangeDTO) {
     console.info("Updating...");
     this.apiClient.apiExchangesUpdatePost(String(exchange.id))
       .subscribe();

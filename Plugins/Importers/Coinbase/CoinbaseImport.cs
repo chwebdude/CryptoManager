@@ -43,7 +43,7 @@ namespace Plugins.Importers.Coinbase
                 foreach (var transaction in transactions)
                 {
                     var crypto = MappTransaction(transaction, exchange.Id);
-                    cryptoTransactions.Add(await crypto);
+                    cryptoTransactions.AddRange(await crypto);
                 }
                 await Task.Delay(2000);
             }
@@ -77,22 +77,33 @@ namespace Plugins.Importers.Coinbase
             return res;
         }
 
-        private async Task<CryptoTransaction> MappTransaction(CoinbaseTransaction transaction, Guid exchangeId)
+        private async Task<CryptoTransaction[]> MappTransaction(CoinbaseTransaction transaction, Guid exchangeId)
         {
 
             switch (transaction.Type)
             {
                 case CoinbaseTransactionTypes.Buy:
 
-                    return CryptoTransaction.NewTrade(transaction.Buy.User_Reference, transaction.Created_At, exchangeId, transaction.Details.Title + " " + transaction.Details.SubTitle,
+                    var transactions = new List<CryptoTransaction>() {CryptoTransaction.NewTrade(transaction.Buy.User_Reference, transaction.Created_At, exchangeId, transaction.Details.Title + " " + transaction.Details.SubTitle,
                         transaction.Buy.Amount.Amount,
                         transaction.Buy.Amount.Currency,
                         transaction.Buy.Fee.Amount,
                         transaction.Buy.Fee.Currency,
                         transaction.Buy.Subtotal.Amount,
-                        transaction.Buy.Subtotal.Currency,
-                     await IsCreditcardPayment(transaction.Buy.Payment_Method.Id));
+                        transaction.Buy.Subtotal.Currency)};
 
+                    if (await IsCreditcardPayment(transaction.Buy.Payment_Method.Id))
+                    {
+                        // Add Second transaction for creditcard payment
+                        transactions.Add(CryptoTransaction.NewIn("Creditcard in from buy " + transaction.Buy.User_Reference, transaction.Created_At, exchangeId, transaction.Details.Title + " " + transaction.Details.SubTitle,
+                            transaction.Buy.Fee.Amount + transaction.Buy.Subtotal.Amount,
+                            transaction.Buy.Subtotal.Currency,
+                            transaction.Details.Payment_Method_Name,
+                            "Coinbase",
+                            string.Empty));
+                    }
+                    
+                    return transactions.ToArray();
 
                 //case CoinbaseTransactionTypes.Sell:
                 //    crypto.SellAmount = transaction.Sell.Amount.Amount;
@@ -107,29 +118,29 @@ namespace Plugins.Importers.Coinbase
                     // Send or receive
                     if (transaction.Network.Status == CoinbaseTransactionStatus.Off_Blockchain)
                         // Is Coinbase gift
-                        return CryptoTransaction.NewIn(transaction.Id, transaction.Created_At, exchangeId,
+                        return new[] {CryptoTransaction.NewIn(transaction.Id, transaction.Created_At, exchangeId,
                             transaction.Details.Title + " " + transaction.Details.SubTitle,
                             transaction.Amount.Amount,
                             transaction.Amount.Currency,
                             "Coinbase",
                             string.Empty,
-                            transaction.Network.Hash);
+                            transaction.Network.Hash)};
 
                     if (transaction.To == null)
                     {
                         // Is Receiving
-                        return CryptoTransaction.NewIn(transaction.Network.Hash, transaction.Created_At, exchangeId,
+                        return new[] {CryptoTransaction.NewIn(transaction.Network.Hash, transaction.Created_At, exchangeId,
                             transaction.Details.Title + " " + transaction.Details.SubTitle,
                             transaction.Amount.Amount,
                             transaction.Amount.Currency,
                             string.Empty, // Todo: Get Network adress
                             string.Empty,
-                            transaction.Network.Hash);
+                            transaction.Network.Hash)};
                     }
                     else
                     {
                         // Is Sending
-                        return CryptoTransaction.NewOut(transaction.Network.Hash, transaction.Created_At, exchangeId,
+                        return new[] {CryptoTransaction.NewOut(transaction.Network.Hash, transaction.Created_At, exchangeId,
                             transaction.Details.Title + " " + transaction.Details.SubTitle,
                             transaction.Network.Transaction_Amount.Amount,
                             transaction.Network.Transaction_Amount.Currency,
@@ -137,24 +148,24 @@ namespace Plugins.Importers.Coinbase
                             transaction.Network.Transaction_Fee.Currency,
                             string.Empty,
                             transaction.To.Address,
-                            transaction.Network.Hash);
+                            transaction.Network.Hash)};
 
                     }
 
                 case CoinbaseTransactionTypes.Fiat_Deposit:
-                    return CryptoTransaction.NewIn(transaction.Fiat_Deposit.User_Reference, transaction.Created_At, exchangeId,
+                    return new[] {CryptoTransaction.NewIn(transaction.Fiat_Deposit.User_Reference, transaction.Created_At, exchangeId,
                         transaction.Details.Title + " " + transaction.Details.SubTitle,
                         transaction.Fiat_Deposit.Amount.Amount,
                         transaction.Fiat_Deposit.Amount.Currency,
                         string.Empty,
                         string.Empty,
-                        string.Empty);
+                        string.Empty)};
 
                 ////case CoinbaseTransactionTypes.Fiat_Withdrawal:
                 ////    break;
                 case CoinbaseTransactionTypes.Exchange_Deposit:
                     //    // Moved to GDAX
-                    return CryptoTransaction.NewOut(transaction.Id, transaction.Created_At, exchangeId,
+                    return new[] {CryptoTransaction.NewOut(transaction.Id, transaction.Created_At, exchangeId,
                         transaction.Details.Title + " " + transaction.Details.SubTitle,
                         -1 * transaction.Amount.Amount,
                         transaction.Amount.Currency,
@@ -162,17 +173,17 @@ namespace Plugins.Importers.Coinbase
                         string.Empty,
                         string.Empty,
                         transaction.Details.SubTitle,
-                        string.Empty);
+                        string.Empty)};
 
                 case CoinbaseTransactionTypes.Exchange_Withdrawal:
                     // From GDAX
-                    return CryptoTransaction.NewIn(transaction.Id, transaction.Created_At, exchangeId,
+                    return new[] {CryptoTransaction.NewIn(transaction.Id, transaction.Created_At, exchangeId,
                         transaction.Details.Title + " " + transaction.Details.SubTitle,
                         transaction.Amount.Amount,
                         transaction.Amount.Currency,
                         transaction.Details.SubTitle,
                         string.Empty,
-                        string.Empty);
+                        string.Empty)};
 
                 default:
                     Logger.Error("Transaction Type not handled: {0}", transaction.Type);
