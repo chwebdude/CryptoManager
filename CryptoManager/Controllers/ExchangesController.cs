@@ -52,10 +52,10 @@ namespace CryptoManager.Controllers
 
         // GET: api/Exchanges
         [HttpGet]
-        public IEnumerable<ExchangeDto> Get()
+        public IEnumerable<ExchangeDTO> Get()
         {
             var data = _cryptoContext.Exchanges.OrderByDescending(e => e.ExchangeId.ToString());
-            var res = _mapper.Map<IEnumerable<ExchangeDto>>(data);
+            var res = _mapper.Map<IEnumerable<ExchangeDTO>>(data);
             return res;
         }
 

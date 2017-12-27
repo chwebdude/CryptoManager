@@ -10,7 +10,21 @@ namespace Model.DbModels
         private CryptoTransaction() { }
 
         // Fee is always added!
-        public static CryptoTransaction NewTrade(string transactionKey, DateTime dateTime, Guid exchangeId, string comment, decimal buyAmount, string buyCurrency, decimal fee, string feeCurrency, decimal sellAmount, string sellCurrency, bool usingWallet)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="transactionKey"></param>
+        /// <param name="dateTime"></param>
+        /// <param name="exchangeId"></param>
+        /// <param name="comment"></param>
+        /// <param name="buyAmount"></param>
+        /// <param name="buyCurrency"></param>
+        /// <param name="fee"></param>
+        /// <param name="feeCurrency"></param>
+        /// <param name="sellAmount">Without fee</param>
+        /// <param name="sellCurrency"></param>
+        /// <returns></returns>
+        public static CryptoTransaction NewTrade(string transactionKey, DateTime dateTime, Guid exchangeId, string comment, decimal buyAmount, string buyCurrency, decimal fee, string feeCurrency, decimal sellAmount, string sellCurrency)
         {
             var t = new CryptoTransaction()
             {
@@ -26,7 +40,6 @@ namespace Model.DbModels
                 SellAmount = sellAmount,
                 SellCurrency = sellCurrency,
                 Rate = sellAmount / buyAmount,
-                TradeWithWallet = usingWallet
             };
 
             return t;
@@ -103,6 +116,5 @@ namespace Model.DbModels
         public string TransactionKey { get; private set; }
 
         public string TransactionHash { get; private set; }
-        public bool TradeWithWallet { get; set; }
     }
 }
