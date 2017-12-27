@@ -57,8 +57,6 @@ namespace Model.Migrations
 
                     b.Property<string>("ToAddress");
 
-                    b.Property<bool>("TradeWithWallet");
-
                     b.Property<string>("TransactionHash");
 
                     b.Property<string>("TransactionKey");
@@ -86,6 +84,24 @@ namespace Model.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Exchanges");
+                });
+
+            modelBuilder.Entity("Model.DbModels.FiatBalance", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Currency");
+
+                    b.Property<Guid>("ExchangeId");
+
+                    b.Property<decimal>("Invested");
+
+                    b.Property<decimal>("Payout");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FiatBalances");
                 });
 
             modelBuilder.Entity("Model.DbModels.Fund", b =>

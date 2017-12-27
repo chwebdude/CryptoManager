@@ -41,7 +41,6 @@ namespace Model.DbModels
                 SellAmount = sellAmount,
                 SellCurrency = sellCurrency,
                 Rate = sellAmount / buyAmount,
-                TradeWithWallet = usingWallet
             };
 
             return t;
@@ -118,6 +117,5 @@ namespace Model.DbModels
         public string TransactionKey { get; private set; }
 
         public string TransactionHash { get; private set; }
-        public bool TradeWithWallet { get; set; }
     }
 }
