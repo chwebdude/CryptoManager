@@ -13,10 +13,12 @@ namespace BackgroundServices
     public class Importer
     {
         private readonly CryptoContext _context;
+        private IMarketData _marketData;
 
-        public Importer(CryptoContext context)
+        public Importer(CryptoContext context, IMarketData marketData)
         {
             _context = context;
+            _marketData = marketData;
         }
 
         public async Task Import(Guid exchangeId, bool recalculate)
@@ -63,7 +65,7 @@ namespace BackgroundServices
             foreach (var allImporter in allImporters)
             {
 
-                var i = (IImporter)Activator.CreateInstance(allImporter);
+                var i = (IImporter)Activator.CreateInstance(allImporter, _marketData);
                 if (i.Exchange == exchangeId)
                     return i;
             }

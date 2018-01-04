@@ -22,12 +22,13 @@ namespace CryptoManager.Controllers
     {
         private readonly CryptoContext _cryptoContext;
         private readonly IMapper _mapper;
+        private IMarketData _marketData;
 
-
-        public ExchangesController(CryptoContext cryptoContext, IMapper mapper)
+        public ExchangesController(CryptoContext cryptoContext, IMapper mapper, IMarketData marketData)
         {
             _cryptoContext = cryptoContext;
             _mapper = mapper;
+            _marketData = marketData;
         }
 
         [HttpGet("availableExchanges")]
@@ -42,7 +43,7 @@ namespace CryptoManager.Controllers
                 var res = new List<ExchangeMeta>();
                 foreach (var importer in types)
                 {
-                    var i = (IImporter)Activator.CreateInstance(importer);
+                    var i = (IImporter)Activator.CreateInstance(importer, _marketData);
                     var meta = i.GetExchangeMeta();
                     res.Add(meta);
                 }
