@@ -104,7 +104,7 @@ namespace BackgroundServices
                         }
                         else
                         {
-                            exchangeWallets.Add(transaction.OutCurrency, -(transaction.InAmount + transaction.FeeAmount));
+                            exchangeWallets.Add(transaction.OutCurrency, -(transaction.OutAmount + transaction.FeeAmount));
                         }
 
                         // Is this a FiatBalance 

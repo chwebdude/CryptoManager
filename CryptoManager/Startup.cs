@@ -38,7 +38,7 @@ namespace CryptoManager
 
             // Add some Swag
             services.AddSwaggerGen(c =>
-                c.SwaggerDoc("v1", new Info()
+                c.SwaggerDoc("v1", new Swashbuckle.AspNetCore.Swagger.Info()
                 {
                     Title = "Crypto Manager API",
                     Version = "v1"
