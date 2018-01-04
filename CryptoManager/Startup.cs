@@ -14,7 +14,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NLog;
+using Plugins;
 using Swashbuckle.AspNetCore.Swagger;
+using CryptoCompare = Plugins.MarketData.CryptoCompare;
 
 namespace CryptoManager
 {
@@ -47,6 +49,8 @@ namespace CryptoManager
             services.AddAutoMapper();
 
             services.AddHangfire(config => config.UseMemoryStorage());
+
+            services.AddSingleton<IMarketData>(new Plugins.MarketData.CryptoCompare());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
