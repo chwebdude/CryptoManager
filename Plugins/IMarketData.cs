@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Plugins
 {
     public interface IMarketData
     {
-        decimal GetCurrentRate(string baseCurrency, string toCurrency);
-        decimal GetHistoricRate(string baseCurrency, string toCurrency, DateTime time);
+        Task<decimal> GetCurrentRate(string baseCurrency, string currency);
+        Task<decimal> GetHistoricRate(string baseCurrency, string currency, DateTime time);
     }
 }
