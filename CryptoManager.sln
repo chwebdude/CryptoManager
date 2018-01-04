@@ -15,9 +15,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
+		docs\RunScripts\RunWindows.bat = docs\RunScripts\RunWindows.bat
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "TestApp\TestApp.csproj", "{C38EC2CB-A59A-4AFB-BFC9-6F040EA83449}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "TestApp\TestApp.csproj", "{10176AEE-A460-437C-827E-5915C3CC5CD5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,10 +42,10 @@ Global
 		{FAC311F7-47DD-45F3-979E-77C376B01413}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FAC311F7-47DD-45F3-979E-77C376B01413}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FAC311F7-47DD-45F3-979E-77C376B01413}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C38EC2CB-A59A-4AFB-BFC9-6F040EA83449}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C38EC2CB-A59A-4AFB-BFC9-6F040EA83449}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C38EC2CB-A59A-4AFB-BFC9-6F040EA83449}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C38EC2CB-A59A-4AFB-BFC9-6F040EA83449}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10176AEE-A460-437C-827E-5915C3CC5CD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10176AEE-A460-437C-827E-5915C3CC5CD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10176AEE-A460-437C-827E-5915C3CC5CD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10176AEE-A460-437C-827E-5915C3CC5CD5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
