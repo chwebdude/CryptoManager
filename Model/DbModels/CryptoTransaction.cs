@@ -11,20 +11,21 @@ namespace Model.DbModels
 
         // Fee is always added!
         /// <summary>
-        /// 
+        /// News the trade.
         /// </summary>
-        /// <param name="transactionKey"></param>
-        /// <param name="dateTime"></param>
-        /// <param name="exchangeId"></param>
-        /// <param name="comment"></param>
-        /// <param name="buyAmount"></param>
-        /// <param name="buyCurrency"></param>
-        /// <param name="fee"></param>
-        /// <param name="feeCurrency"></param>
+        /// <param name="transactionKey">The transaction key.</param>
+        /// <param name="dateTime">The date time.</param>
+        /// <param name="exchangeId">The exchange identifier.</param>
+        /// <param name="comment">The comment.</param>
+        /// <param name="buyAmount">The buy amount.</param>
+        /// <param name="buyCurrency">The buy currency.</param>
+        /// <param name="fee">The fee.</param>
+        /// <param name="feeCurrency">The fee currency.</param>
         /// <param name="sellAmount">Without fee</param>
-        /// <param name="sellCurrency"></param>
-        /// <returns></returns>
-        public static CryptoTransaction NewTrade(string transactionKey, DateTime dateTime, Guid exchangeId, string comment, decimal buyAmount, string buyCurrency, decimal fee, string feeCurrency, decimal sellAmount, string sellCurrency)
+        /// <param name="sellCurrency">The sell currency.</param>
+        /// <param name="fiatRate">The fiat rate of the buying currency.</param>
+        /// <returns>CryptoTransaction.</returns>
+        public static CryptoTransaction NewTrade(string transactionKey, DateTime dateTime, Guid exchangeId, string comment, decimal buyAmount, string buyCurrency, decimal fee, string feeCurrency, decimal sellAmount, string sellCurrency, decimal fiatRate)
         {
             var t = new CryptoTransaction()
             {
@@ -40,6 +41,8 @@ namespace Model.DbModels
                 SellAmount = sellAmount,
                 SellCurrency = sellCurrency,
                 Rate = sellAmount / buyAmount,
+                BuyFiatRate = fiatRate,
+                BuyFiatAmount = fiatRate * buyAmount
             };
 
             return t;
@@ -102,7 +105,8 @@ namespace Model.DbModels
 
         public decimal BuyAmount { get; private set; }
         public string BuyCurrency { get; private set; }
-
+        public decimal BuyFiatRate { get; set; }
+        public decimal BuyFiatAmount { get; set; }
         public decimal SellAmount { get; private set; }
         public string SellCurrency { get; private set; }
 
