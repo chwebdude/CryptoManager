@@ -16,8 +16,8 @@ namespace CryptoManager.Controllers
     [Route("api/Investments")]
     public class InvestmentsController : Controller
     {
-        private CryptoContext _cryptoContext;
-        private IMarketData _marketData;
+        private readonly CryptoContext _cryptoContext;
+        private readonly IMarketData _marketData;
         private readonly IMapper _mapper;
 
 
@@ -43,31 +43,6 @@ namespace CryptoManager.Controllers
                 res.Add(dto);
             }
             return res;
-        }
-
-        // GET: api/Investments/5
-        [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST: api/Investments
-        [HttpPost]
-        public void Post([FromBody]string value)
-        {
-        }
-
-        // PUT: api/Investments/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+        }        
     }
 }
