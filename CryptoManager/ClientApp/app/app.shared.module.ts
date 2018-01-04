@@ -16,6 +16,7 @@ import { HomeComponent } from './components/home/home.component';
 import { ExchangesComponent } from './components/exchanges/exchanges.component';
 import { TransactionsComponent } from './components/transactions/transactions.component';
 import { FundsComponent } from './components/funds/funds.component';
+import { InvestmentsComponent } from './components/investments/investments.component'
 
 import { CryptoApiClient } from './services/api-client';
 
@@ -26,7 +27,8 @@ import { CryptoApiClient } from './services/api-client';
     HomeComponent,
     ExchangesComponent,
     TransactionsComponent,
-    FundsComponent
+    FundsComponent,
+    InvestmentsComponent
   ],
   imports: [
     CommonModule,
@@ -48,6 +50,7 @@ import { CryptoApiClient } from './services/api-client';
       { path: 'home', component: HomeComponent },
       { path: 'transactions', component: TransactionsComponent },
       { path: 'funds', component: FundsComponent },
+      { path: 'investments', component: InvestmentsComponent },
       { path: 'exchanges', component: ExchangesComponent },
       { path: '**', redirectTo: 'home' }
     ])
