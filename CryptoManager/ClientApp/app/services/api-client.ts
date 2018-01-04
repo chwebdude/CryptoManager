@@ -782,6 +782,8 @@ export class FundDTO implements IFundDTO {
     amount?: number | undefined;
     exchangeName?: string | undefined;
     exchangeId?: string | undefined;
+    worthFiat?: number | undefined;
+    currentFiatRate?: number | undefined;
 
     constructor(data?: IFundDTO) {
         if (data) {
@@ -799,6 +801,8 @@ export class FundDTO implements IFundDTO {
             this.amount = data["amount"];
             this.exchangeName = data["exchangeName"];
             this.exchangeId = data["exchangeId"];
+            this.worthFiat = data["worthFiat"];
+            this.currentFiatRate = data["currentFiatRate"];
         }
     }
 
@@ -815,6 +819,8 @@ export class FundDTO implements IFundDTO {
         data["amount"] = this.amount;
         data["exchangeName"] = this.exchangeName;
         data["exchangeId"] = this.exchangeId;
+        data["worthFiat"] = this.worthFiat;
+        data["currentFiatRate"] = this.currentFiatRate;
         return data; 
     }
 }
@@ -825,6 +831,8 @@ export interface IFundDTO {
     amount?: number | undefined;
     exchangeName?: string | undefined;
     exchangeId?: string | undefined;
+    worthFiat?: number | undefined;
+    currentFiatRate?: number | undefined;
 }
 
 export class AggrInvestmentDTO implements IAggrInvestmentDTO {
