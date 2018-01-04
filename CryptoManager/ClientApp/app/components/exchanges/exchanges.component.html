@@ -9,12 +9,12 @@
         <div class="panel-heading">{{selectedAvailableExchange.name}}</div>
         <div class="panel-body">
 
-            <div class="form-group">
+            <div class="form-group" *ngIf="selectedAvailableExchange.labelPublicKey != null ">
                 <label for="publicKey">{{selectedAvailableExchange.labelPublicKey}}</label>
                 <input type="text" class="form-control" id="publicKey" placeholder="{{selectedAvailableExchange.labelPublicKey}}" [(ngModel)]="publicKey">
             </div>
 
-            <div class="form-group">
+            <div class="form-group" *ngIf="selectedAvailableExchange.labelPrivateKey != null ">
                 <label for="privateKey">{{selectedAvailableExchange.labelPrivateKey}}</label>
                 <input type="text" class="form-control" id="privateKey" placeholder="{{selectedAvailableExchange.labelPrivateKey}}" [(ngModel)]="privateKey">
             </div>
