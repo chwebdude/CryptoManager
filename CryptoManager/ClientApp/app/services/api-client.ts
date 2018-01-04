@@ -414,7 +414,7 @@ export class CryptoApiClient {
     /**
      * @return Success
      */
-    apiInvestmentsGet(): Observable<InvestmentDTO[]> {
+    apiInvestmentsGet(): Observable<AggrInvestmentDTO> {
         let url_ = this.baseUrl + "/api/Investments";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -434,14 +434,14 @@ export class CryptoApiClient {
                 try {
                     return this.processApiInvestmentsGet(<any>response_);
                 } catch (e) {
-                    return <Observable<InvestmentDTO[]>><any>Observable.throw(e);
+                    return <Observable<AggrInvestmentDTO>><any>Observable.throw(e);
                 }
             } else
-                return <Observable<InvestmentDTO[]>><any>Observable.throw(response_);
+                return <Observable<AggrInvestmentDTO>><any>Observable.throw(response_);
         });
     }
 
-    protected processApiInvestmentsGet(response: HttpResponseBase): Observable<InvestmentDTO[]> {
+    protected processApiInvestmentsGet(response: HttpResponseBase): Observable<AggrInvestmentDTO> {
         const status = response.status;
         const responseBlob = 
             response instanceof HttpResponse ? response.body : 
@@ -452,11 +452,7 @@ export class CryptoApiClient {
             return blobToText(responseBlob).flatMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (resultData200 && resultData200.constructor === Array) {
-                result200 = [];
-                for (let item of resultData200)
-                    result200.push(InvestmentDTO.fromJS(item));
-            }
+            result200 = resultData200 ? AggrInvestmentDTO.fromJS(resultData200) : new AggrInvestmentDTO();
             return Observable.of(result200);
             });
         } else if (status !== 200 && status !== 204) {
@@ -464,7 +460,7 @@ export class CryptoApiClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
-        return Observable.of<InvestmentDTO[]>(<any>null);
+        return Observable.of<AggrInvestmentDTO>(<any>null);
     }
 
     /**
@@ -829,6 +825,77 @@ export interface IFundDTO {
     amount?: number | undefined;
     exchangeName?: string | undefined;
     exchangeId?: string | undefined;
+}
+
+export class AggrInvestmentDTO implements IAggrInvestmentDTO {
+    investments?: InvestmentDTO[] | undefined;
+    tokenProfits?: { [key: string] : number; } | undefined;
+    totalWorth?: number | undefined;
+    totalTradeInvest?: number | undefined;
+    profit?: number | undefined;
+
+    constructor(data?: IAggrInvestmentDTO) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            if (data["investments"] && data["investments"].constructor === Array) {
+                this.investments = [];
+                for (let item of data["investments"])
+                    this.investments.push(InvestmentDTO.fromJS(item));
+            }
+            if (data["tokenProfits"]) {
+                this.tokenProfits = {};
+                for (let key in data["tokenProfits"]) {
+                    if (data["tokenProfits"].hasOwnProperty(key))
+                        this.tokenProfits[key] = data["tokenProfits"][key];
+                }
+            }
+            this.totalWorth = data["totalWorth"];
+            this.totalTradeInvest = data["totalTradeInvest"];
+            this.profit = data["profit"];
+        }
+    }
+
+    static fromJS(data: any): AggrInvestmentDTO {
+        let result = new AggrInvestmentDTO();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (this.investments && this.investments.constructor === Array) {
+            data["investments"] = [];
+            for (let item of this.investments)
+                data["investments"].push(item.toJSON());
+        }
+        if (this.tokenProfits) {
+            data["tokenProfits"] = {};
+            for (let key in this.tokenProfits) {
+                if (this.tokenProfits.hasOwnProperty(key))
+                    data["tokenProfits"][key] = this.tokenProfits[key];
+            }
+        }
+        data["totalWorth"] = this.totalWorth;
+        data["totalTradeInvest"] = this.totalTradeInvest;
+        data["profit"] = this.profit;
+        return data; 
+    }
+}
+
+export interface IAggrInvestmentDTO {
+    investments?: InvestmentDTO[] | undefined;
+    tokenProfits?: { [key: string] : number; } | undefined;
+    totalWorth?: number | undefined;
+    totalTradeInvest?: number | undefined;
+    profit?: number | undefined;
 }
 
 export class InvestmentDTO implements IInvestmentDTO {
