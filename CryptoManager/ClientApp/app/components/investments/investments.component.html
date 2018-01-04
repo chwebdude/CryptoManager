@@ -1,1 +1,40 @@
 <h1>Investments</h1>
+<p-dataTable [value]="investments">
+
+
+
+
+
+    <p-column styleClass="col-button" header="Buy">
+        <ng-template let-buy="rowData" pTemplate="body">
+            {{buy.buyAmount}} {{buy.buyCurrency}}
+        </ng-template>
+    </p-column>
+
+    <p-column styleClass="col-button" header="Sell">
+        <ng-template let-sell="rowData" pTemplate="body">
+            {{sell.sellAmount}} {{sell.sellCurrency}}
+        </ng-template>
+    </p-column>
+
+    <p-column field="rate" header="Rate"></p-column>
+
+    <p-column styleClass="col-button" header="Worth at Buy">
+        <ng-template let-buyFiat="rowData" pTemplate="body">
+            {{buyFiat.buyFiatAmount | currency:'CHF '}} @ {{buyFiat.buyFiatRate | currency:'CHF '}}
+        </ng-template>
+    </p-column>
+
+    <p-column styleClass="col-button" header="Worth now">
+        <ng-template let-worth="rowData" pTemplate="body">
+            {{worth.currentFiatValue | currency:'CHF '}} @ {{worth.currentFiatRate | currency:'CHF '}}
+        </ng-template>
+    </p-column>
+
+    <p-column styleClass="col-button" header="Difference">
+        <ng-template let-diff="rowData" pTemplate="body">
+            {{diff.currentFiatValue - diff.buyFiatAmount | currency:'CHF '}}
+        </ng-template>
+    </p-column>
+
+</p-dataTable>
