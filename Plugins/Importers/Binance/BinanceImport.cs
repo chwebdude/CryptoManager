@@ -111,6 +111,10 @@ namespace Plugins.Importers.Binance
                     throw new ArgumentOutOfRangeException("Unknown symbol: " + symbol);
                 }
 
+                // Rename Bitcoin cash
+                if (currency2 == "BCC")
+                    currency2 = "BCH";
+
                 foreach (var trade in bccTrades.Data)
                 {
                     if (trade.IsBuyer)
