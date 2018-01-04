@@ -30,19 +30,40 @@ namespace CryptoManager.Controllers
 
         // GET: api/Investments
         [HttpGet]
-        public async Task<IEnumerable<InvestmentDTO>> Get()
+        public async Task<AggrInvestmentDTO> Get()
         {
+            var aggregation = new AggrInvestmentDTO();
             var trades = _cryptoContext.Transactions.Where(t => t.Type == TransactionType.Trade);
-            var res = new List<InvestmentDTO>();
+            aggregation.Investments = new List<InvestmentDTO>();
             foreach (var trade in trades)
             {
                 var currentRate = await _marketData.GetCurrentRate("CHF", trade.BuyCurrency);
                 var dto = _mapper.Map<InvestmentDTO>(trade);
                 dto.CurrentFiatRate = currentRate;
                 dto.CurrentFiatValue = dto.BuyAmount * currentRate;
-                res.Add(dto);
+                aggregation.Investments.Add(dto);
+
+                aggregation.TotalTradeInvest += dto.BuyFiatAmount;
+                aggregation.TotalWorth += dto.CurrentFiatValue;
             }
-            return res;
-        }        
+
+
+            // This calculation is usless since it needs to be respected when a token is sold
+
+            var grouped = aggregation.Investments.GroupBy(dto => dto.BuyCurrency)
+                .Select(g => new
+                {
+                    Key = g.Key,
+                    Profit = g.Sum(v => v.CurrentFiatValue - v.BuyFiatAmount)
+                });
+            aggregation.TokenProfits = grouped.ToDictionary(arg => arg.Key, arg => arg.Profit);
+
+
+
+
+            aggregation.Profit = aggregation.TotalWorth - aggregation.TotalTradeInvest;
+
+            return aggregation;
+        }
     }
 }
