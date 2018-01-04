@@ -15,6 +15,14 @@ namespace Plugins.Importers.Binance
     {
         private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
+        private IMarketData _marketData;
+
+        public BinanceImport(IMarketData marketData)
+        {
+            this._marketData = marketData;
+        }
+
+
         public async Task<IEnumerable<CryptoTransaction>> GetTransactions(Exchange exchange)
         {
             var client = new BinanceClient(exchange.PublicKey, exchange.PrivateKey);
@@ -120,7 +128,7 @@ namespace Plugins.Importers.Binance
                             CryptoTransaction.NewTrade(trade.Id.ToString(), trade.Time, exchange.Id, "Binance Buy",
                                 trade.Quantity, currency2, trade.Commission, trade.CommissionAsset,
                                 trade.Price * trade.Quantity,
-                                currency1)
+                                currency1, await _marketData.GetHistoricRate("CHF", currency2, trade.Time))
                         );
                     }
                     else
@@ -129,7 +137,7 @@ namespace Plugins.Importers.Binance
                         trades.Add(
                         CryptoTransaction.NewTrade(trade.Id.ToString(), trade.Time, exchange.Id, "Binance Sell",
                             trade.Price * trade.Quantity, currency1, trade.Commission, trade.CommissionAsset, trade.Quantity,
-                            currency2)
+                            currency2, await _marketData.GetHistoricRate("CHF", currency1, trade.Time))
                             );
                     }
                 }
