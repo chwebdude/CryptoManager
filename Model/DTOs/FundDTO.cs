@@ -11,5 +11,7 @@ namespace Model.DTOs
         public decimal Amount { get; set; }
         public string ExchangeName { get; set; }
         public Guid ExchangeId { get; set; }
+        public decimal WorthFiat { get; set; }
+        public decimal CurrentFiatRate { get; set; }
     }
 }
