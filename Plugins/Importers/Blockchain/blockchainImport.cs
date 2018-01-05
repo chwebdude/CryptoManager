@@ -13,7 +13,14 @@ namespace Plugins.Importers.Blockchain
 {
     public class BlockchainImport : IImporter
     {
+
+        private readonly IMarketData _marketData;
         private static ILogger Logger = LogManager.GetCurrentClassLogger();
+
+        public BlockchainImport(IMarketData marketData)
+        {
+            _marketData = marketData;
+        }
 
         public async Task<IEnumerable<CryptoTransaction>> GetTransactions(Exchange exchange)
         {
