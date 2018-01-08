@@ -5,6 +5,8 @@
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <IsPackable>false</IsPackable>
+    <RuntimeIdentifiers>win-x64;osx-x64</RuntimeIdentifiers>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,6 +17,7 @@
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Design" Version="1.1.5" />
+    <PackageReference Include="Microsoft.NETCore.Runtime.CoreCLR" Version="2.0.4" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.1" />
     <PackageReference Include="NLog" Version="4.5.0-rc03" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.5.0-rc2" />
