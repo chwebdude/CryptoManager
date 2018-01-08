@@ -89,7 +89,7 @@ namespace Plugins.MarketData
                     CoinCache.Add(coin.Value.Symbol, new CoinMeta()
                     {
                         Symbol = coin.Value.Symbol,
-                        ImageUrl = coin.Value.ImageUrl,
+                        ImageUrl = data.BaseImageUrl + coin.Value.ImageUrl,
                         Name = coin.Value.CoinName,
                         Url = data.BaseImageUrl + coin.Value.Url
                     });
