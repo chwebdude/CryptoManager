@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CryptoCompare;
 using Microsoft.Extensions.Caching.Memory;
+using Model.Meta;
 using NLog;
 
 namespace Plugins.MarketData
@@ -13,6 +15,7 @@ namespace Plugins.MarketData
 
         private static readonly MemoryCache Cache = new MemoryCache(new MemoryCacheOptions());
         private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
+        private static Dictionary<string, CoinMeta> CoinCache = new Dictionary<string, CoinMeta>();
 
         #endregion
 
@@ -73,6 +76,28 @@ namespace Plugins.MarketData
                 }
             }
             throw new Exception("Failted to get Historic Market data", ex);
+        }
+
+        public async Task<CoinMeta> GetCoinInfo(string symbol)
+        {
+            if (CoinCache.Count == 0)
+            {
+                
+                var client = new CryptoCompareClient();
+                var data = await client.Coins.ListAsync();
+                foreach (var coin in data.Coins)
+                {
+                    CoinCache.Add(coin.Value.Symbol, new CoinMeta()
+                    {
+                        Symbol = coin.Value.Symbol,
+                        ImageUrl = coin.Value.ImageUrl,
+                        Name = coin.Value.FullName,
+                        Url = coin.Value.Url
+                    });
+                }
+            }
+
+            return CoinCache[symbol];
         }
 
         #endregion
