@@ -23,6 +23,8 @@ namespace Plugins.Importers.Coinbase
         private string _apiKey;
         private const string ApiVersion = "2017-08-07";
 
+        private IMarketData _marketData;
+
         public async Task<IEnumerable<CryptoTransaction>> GetTransactions(Exchange exchange)
         {
             _apiKey = exchange.PublicKey;
@@ -65,6 +67,12 @@ namespace Plugins.Importers.Coinbase
         public Model.Enums.Exchange Exchange => Model.Enums.Exchange.Coinbase;
 
         private static Dictionary<string, bool> IsCreditcardPaymentCache = new Dictionary<string, bool>();
+
+        public CoinbaseImport(IMarketData marketData)
+        {
+            _marketData = marketData;
+        }
+
         private async Task<bool> IsCreditcardPayment(string paymentMethodId)
         {
             if (IsCreditcardPaymentCache.ContainsKey(paymentMethodId))
@@ -90,7 +98,8 @@ namespace Plugins.Importers.Coinbase
                         transaction.Buy.Fee.Amount,
                         transaction.Buy.Fee.Currency,
                         transaction.Buy.Subtotal.Amount,
-                        transaction.Buy.Subtotal.Currency)};
+                        transaction.Buy.Subtotal.Currency,
+                        await _marketData.GetHistoricRate("CHF", transaction.Buy.Amount.Currency, transaction.Created_At))};
 
                     if (await IsCreditcardPayment(transaction.Buy.Payment_Method.Id))
                     {
