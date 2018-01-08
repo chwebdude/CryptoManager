@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Model.Meta;
 
 namespace Model.DTOs
 {
@@ -11,5 +12,8 @@ namespace Model.DTOs
         public decimal Amount { get; set; }
         public string ExchangeName { get; set; }
         public Guid ExchangeId { get; set; }
+        public decimal WorthFiat { get; set; }
+        public decimal CurrentFiatRate { get; set; }
+        public CoinMeta CoinMeta { get; set; }
     }
 }
