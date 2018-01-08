@@ -3,7 +3,7 @@
     <p-column field="exchangeName" header="Exchange" [style]="{'width': '180px'}"></p-column>
     <p-column styleClass="col-button" header="Balance">
         <ng-template let-fund="rowData" pTemplate="body">
-            {{fund.amount}} {{fund.currency}}
+            <img *ngIf="fund.coinMeta != null" [src]="fund.coinMeta.imageUrl" height="20px" />      {{fund.amount}} {{fund.currency}}
         </ng-template>
     </p-column>
     <p-column styleClass="col-button" header="Current Value per Coin">

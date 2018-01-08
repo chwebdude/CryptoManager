@@ -784,6 +784,7 @@ export class FundDTO implements IFundDTO {
     exchangeId?: string | undefined;
     worthFiat?: number | undefined;
     currentFiatRate?: number | undefined;
+    coinMeta?: CoinMeta | undefined;
 
     constructor(data?: IFundDTO) {
         if (data) {
@@ -803,6 +804,7 @@ export class FundDTO implements IFundDTO {
             this.exchangeId = data["exchangeId"];
             this.worthFiat = data["worthFiat"];
             this.currentFiatRate = data["currentFiatRate"];
+            this.coinMeta = data["coinMeta"] ? CoinMeta.fromJS(data["coinMeta"]) : <any>undefined;
         }
     }
 
@@ -821,6 +823,7 @@ export class FundDTO implements IFundDTO {
         data["exchangeId"] = this.exchangeId;
         data["worthFiat"] = this.worthFiat;
         data["currentFiatRate"] = this.currentFiatRate;
+        data["coinMeta"] = this.coinMeta ? this.coinMeta.toJSON() : <any>undefined;
         return data; 
     }
 }
@@ -833,6 +836,54 @@ export interface IFundDTO {
     exchangeId?: string | undefined;
     worthFiat?: number | undefined;
     currentFiatRate?: number | undefined;
+    coinMeta?: CoinMeta | undefined;
+}
+
+export class CoinMeta implements ICoinMeta {
+    symbol?: string | undefined;
+    name?: string | undefined;
+    imageUrl?: string | undefined;
+    url?: string | undefined;
+
+    constructor(data?: ICoinMeta) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.symbol = data["symbol"];
+            this.name = data["name"];
+            this.imageUrl = data["imageUrl"];
+            this.url = data["url"];
+        }
+    }
+
+    static fromJS(data: any): CoinMeta {
+        let result = new CoinMeta();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["symbol"] = this.symbol;
+        data["name"] = this.name;
+        data["imageUrl"] = this.imageUrl;
+        data["url"] = this.url;
+        return data; 
+    }
+}
+
+export interface ICoinMeta {
+    symbol?: string | undefined;
+    name?: string | undefined;
+    imageUrl?: string | undefined;
+    url?: string | undefined;
 }
 
 export class AggrInvestmentDTO implements IAggrInvestmentDTO {
@@ -1119,16 +1170,19 @@ export interface ICryptoTransaction {
 export enum ExchangeMetaExchangeId {
     _1 = 1, 
     _2 = 2, 
+    _3 = 3, 
 }
 
 export enum ExchangeDTOExchange {
     _1 = 1, 
     _2 = 2, 
+    _3 = 3, 
 }
 
 export enum ExchangeId {
     _1 = 1, 
     _2 = 2, 
+    _3 = 3, 
 }
 
 export enum CryptoTransactionType {
