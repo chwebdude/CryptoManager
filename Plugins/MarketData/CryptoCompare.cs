@@ -82,7 +82,6 @@ namespace Plugins.MarketData
         {
             if (CoinCache.Count == 0)
             {
-                
                 var client = new CryptoCompareClient();
                 var data = await client.Coins.ListAsync();
                 foreach (var coin in data.Coins)
@@ -91,13 +90,16 @@ namespace Plugins.MarketData
                     {
                         Symbol = coin.Value.Symbol,
                         ImageUrl = coin.Value.ImageUrl,
-                        Name = coin.Value.FullName,
-                        Url = coin.Value.Url
+                        Name = coin.Value.CoinName,
+                        Url = data.BaseImageUrl + coin.Value.Url
                     });
                 }
             }
 
-            return CoinCache[symbol];
+            if (CoinCache.ContainsKey(symbol))
+                return CoinCache[symbol];
+            Logger.Warn("Symbol {0} not present in cache", symbol);
+            return null;
         }
 
         #endregion
