@@ -1,15 +1,25 @@
 <h1>Funds</h1>
 <p-dataTable [value]="funds">
-    <p-column field="exchangeName" header="Exchange" [style]="{'width': '180px'}"></p-column>    
+    <p-column field="exchangeName" header="Exchange" [style]="{'width': '180px'}"></p-column>
     <p-column styleClass="col-button" header="Balance">
         <ng-template let-fund="rowData" pTemplate="body">
-            {{fund.amount}} {{fund.currency}}
+            <img *ngIf="fund.coinMeta != null" [src]="fund.coinMeta.imageUrl" height="20px" />      {{fund.amount}} {{fund.currency}}
         </ng-template>
-    </p-column>    
+    </p-column>
+    <p-column styleClass="col-button" header="Current Value per Coin">
+        <ng-template let-fund="rowData" pTemplate="body">
+            {{fund.currentFiatRate | currency:'CHF '}}
+        </ng-template>
+    </p-column>
+    <p-column styleClass="col-button" header="Worth">
+        <ng-template let-fund="rowData" pTemplate="body">
+            {{fund.worthFiat | currency:'CHF '}}
+        </ng-template>
+    </p-column>
 </p-dataTable>
 
-<br/>
-<br/>
+<br />
+<br />
 <h1>Fiat</h1>
 <p-dataTable [value]="fiat">
     <p-column field="exchangeName" header="Exchange" [style]="{'width': '180px'}"></p-column>

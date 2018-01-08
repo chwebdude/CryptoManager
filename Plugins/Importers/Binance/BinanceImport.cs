@@ -15,13 +15,21 @@ namespace Plugins.Importers.Binance
     {
         private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
+        private IMarketData _marketData;
+
+        public BinanceImport(IMarketData marketData)
+        {
+            this._marketData = marketData;
+        }
+
+
         public async Task<IEnumerable<CryptoTransaction>> GetTransactions(Exchange exchange)
         {
             var client = new BinanceClient(exchange.PublicKey, exchange.PrivateKey);
             var trades = new List<CryptoTransaction>();
             trades.AddRange(await GetTransactions(client, exchange));
             trades.AddRange(await GetTrades(client, exchange));
-            
+
             return trades;
         }
 
@@ -32,7 +40,7 @@ namespace Plugins.Importers.Binance
             foreach (var deposit in deposits.Data.List)
             {
                 transactions.Add(
-                    CryptoTransaction.NewIn(deposit.InsertTime.ToFileTimeUtc().ToString(), deposit.InsertTime, exchange.Id, "Transfered "+deposit.Asset+" to Binance", deposit.Amount, deposit.Asset, string.Empty, string.Empty, string.Empty)
+                    CryptoTransaction.NewIn(deposit.InsertTime.ToFileTimeUtc().ToString(), deposit.InsertTime, exchange.Id, "Transfered " + deposit.Asset + " to Binance", deposit.Amount, deposit.Asset, string.Empty, string.Empty, string.Empty)
                     );
             }
 
@@ -40,7 +48,7 @@ namespace Plugins.Importers.Binance
             foreach (var withdrawal in withdraws.Data.List)
             {
                 transactions.Add(
-                    CryptoTransaction.NewOut(withdrawal.TransactionId, withdrawal.ApplyTime, exchange.Id, "Transfered "+withdrawal.Asset+ " from Binance",
+                    CryptoTransaction.NewOut(withdrawal.TransactionId, withdrawal.ApplyTime, exchange.Id, "Transfered " + withdrawal.Asset + " from Binance",
                     withdrawal.Amount,
                     withdrawal.Asset,
                     0,
@@ -68,7 +76,6 @@ namespace Plugins.Importers.Binance
                 var symbol = binancePrice.Symbol;
                 Logger.Debug("Ask " + symbol + " (" + counter++ + "/" + prices.Data.Length + ")");
                 string currency1 = null, currency2 = null;
-                var bccTrades = await client.GetMyTradesAsync(symbol);
 
                 if (symbol.EndsWith("BTC"))
                 {
@@ -111,27 +118,41 @@ namespace Plugins.Importers.Binance
                     throw new ArgumentOutOfRangeException("Unknown symbol: " + symbol);
                 }
 
-                foreach (var trade in bccTrades.Data)
+                // Rename Bitcoin cash
+                if (currency2 == "BCC")
+                    currency2 = "BCH";
+
+                var binanceApiResult = await client.GetMyTradesAsync(symbol);
+                if (binanceApiResult.Success)
                 {
-                    if (trade.IsBuyer)
+
+                    foreach (var trade in binanceApiResult.Data)
                     {
-                        // Buy
-                        trades.Add(
-                            CryptoTransaction.NewTrade(trade.Id.ToString(), trade.Time, exchange.Id, "Binance Buy",
-                                trade.Quantity, currency2, trade.Commission, trade.CommissionAsset,
-                                trade.Price * trade.Quantity,
-                                currency1)
-                        );
-                    }
-                    else
-                    {
-                        // Sell
-                        trades.Add(
-                        CryptoTransaction.NewTrade(trade.Id.ToString(), trade.Time, exchange.Id, "Binance Sell",
-                            trade.Price * trade.Quantity, currency1, trade.Commission, trade.CommissionAsset, trade.Quantity,
-                            currency2)
+                        if (trade.IsBuyer)
+                        {
+                            // Buy
+                            trades.Add(
+                                CryptoTransaction.NewTrade(trade.Id.ToString(), trade.Time, exchange.Id, "Binance Buy",
+                                    trade.Quantity, currency2, trade.Commission, trade.CommissionAsset,
+                                    trade.Price * trade.Quantity,
+                                    currency1, await _marketData.GetHistoricRate("CHF", currency2, trade.Time))
                             );
+                        }
+                        else
+                        {
+                            // Sell
+                            trades.Add(
+                                CryptoTransaction.NewTrade(trade.Id.ToString(), trade.Time, exchange.Id, "Binance Sell",
+                                    trade.Price * trade.Quantity, currency1, trade.Commission, trade.CommissionAsset,
+                                    trade.Quantity,
+                                    currency2, await _marketData.GetHistoricRate("CHF", currency1, trade.Time))
+                            );
+                        }
                     }
+                }
+                else
+                {
+                    Logger.Error(binanceApiResult.Error.Code + " " + binanceApiResult.Error.Message);
                 }
             }
             return trades;
