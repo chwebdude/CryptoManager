@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CryptoManager.Models;
+using Microsoft.EntityFrameworkCore;
 using Model.DbModels;
 using Model.Enums;
 
@@ -32,7 +33,7 @@ namespace BackgroundServices
                     ? fiatDict[transaction.ExchangeId]
                     : new Dictionary<string, Fiat>();
 
-       
+
                 switch (transaction.Type)
                 {
                     case TransactionType.Trade:
@@ -91,7 +92,7 @@ namespace BackgroundServices
                             {
                                 fiatEx.Add(transaction.InCurrency, new Fiat
                                 {
-                                   Investments = transaction.InAmount
+                                    Investments = transaction.InAmount
                                 });
                             }
                         }
@@ -193,6 +194,68 @@ namespace BackgroundServices
             _context.SaveChanges();
         }
 
+
+        public void CalculateFlow()
+        {
+            var transactions = _context.Transactions.OrderBy(t => t.DateTime);
+            _context.Flows.RemoveRange(_context.Flows);
+            _context.SaveChanges();
+
+
+            foreach (var transaction in transactions)
+            {
+                var flow = new Flow()
+                {
+                    TransactionId = transaction.Id,
+                    DateTime = transaction.DateTime,
+                };
+                switch (transaction.Type)
+                {
+                    case TransactionType.Trade:
+                        break;
+                    case TransactionType.In:
+                        // Search for Sender 
+                        var senderTransaction =
+                            _context.Transactions.SingleOrDefault(t => !string.IsNullOrEmpty(t.TransactionHash) && t.TransactionHash == transaction.TransactionHash && t.Id != transaction.Id);
+                        flow.Amount = transaction.InAmount;
+                        flow.Currency = transaction.InCurrency;
+                        flow.ExchangeId = transaction.ExchangeId;
+
+                        if (senderTransaction != null)
+                        {
+                            var parentFlow = _context.Flows.Single(f => f.TransactionId == senderTransaction.Id);
+                            flow.Parents = new List<Flow>() { parentFlow };
+                        }
+
+                        break;
+                    case TransactionType.Out:
+                        flow.Amount = transaction.OutAmount;
+                        flow.Currency = transaction.OutCurrency;
+
+                        //Todo: Get last from time
+                        var lastFlow = _context.Flows.First(f =>
+                            f.Currency == flow.Currency && f.ExchangeId == transaction.ExchangeId);
+                        flow.Parents = new List<Flow>() { lastFlow };
+
+                        //Todo: Determine Exchange
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+                _context.Flows.Add(flow);
+
+            }
+
+            var start = transactions.First();
+            _context.Flows.Add(new Flow
+            {
+                DateTime = start.DateTime,
+                Amount = start.BuyAmount,
+                Currency = start.BuyCurrency
+            });
+            _context.SaveChanges();
+        }
 
         class Fiat
         {

@@ -11,5 +11,7 @@ namespace Model.DbModels
         public DateTime DateTime { get; set; }
         public decimal Amount { get; set; }
         public string Currency { get; set; }
+        public Guid ExchangeId { get; set; }
+        public Guid TransactionId { get; set; }
     }
 }
