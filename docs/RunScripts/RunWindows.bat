@@ -1,4 +1,3 @@
-cd "CryptoManager\"
-start dotnet "CryptoManager.dll"
-timeout /t 5
+start  "bin\CryptoManager.exe"
+timeout /t 10
 start http://localhost:5000
