@@ -7,7 +7,8 @@ init:
 - cmd: git config --global core.autocrlf true
 install:
 - ps: Install-Product node ''
-cache: '%LOCALAPPDATA%\\Yarn'
+cache:
+ - "%LOCALAPPDATA%\\Yarn" 
 build_script:
 - cmd: >-
     dotnet --version
@@ -25,6 +26,8 @@ build_script:
     REM dotnet build ./CryptoManager.csproj --verbosity m
 
     dotnet publish --runtime win10-x64
+
+    cd ..
 
     7z a CryptoManager-win64.zip docs\RunScripts\RunWindows.bat
 
