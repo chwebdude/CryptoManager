@@ -26,16 +26,4 @@ build_script:
     REM dotnet build ./CryptoManager.csproj --verbosity m
 
     dotnet publish --runtime win10-x64
-
-    cd ..
-
-    7z a CryptoManager-win64.zip docs\RunScripts\RunWindows.bat
-
-    7z a CryptoManager-win64.zip CryptoManager\bin\Debug\netcoreapp2.0\win10-x64\publish
 test: off
-artifacts:
-- path: 'CryptoManager-win64.zip'
-  name: CryptoManager-win64
-deploy:
-- provider: Environment
-  name: CryptoManager
