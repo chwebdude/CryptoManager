@@ -78,7 +78,12 @@ namespace CryptoManager.Controllers
             if (exchangeMeta.SupportsPublicKey && string.IsNullOrEmpty(value.PublicKey))
                 throw new ArgumentOutOfRangeException(nameof(value.PublicKey), exchangeMeta.LabelPublicKey + " was not provided");
 
-            // Add Data
+            // Trim data
+            value.Comment = value.Comment.Trim();
+            value.PrivateKey = value.PrivateKey.Trim();
+            value.PublicKey = value.PublicKey.Trim();
+
+            // Add Data            
             await _cryptoContext.Exchanges.AddAsync(value);
             await _cryptoContext.SaveChangesAsync();
 
