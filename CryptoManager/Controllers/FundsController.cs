@@ -40,6 +40,7 @@ namespace CryptoManager.Controllers
                 fundDto.ExchangeName = exchange.ExchangeId.ToString();
                 fundDto.CurrentFiatRate = await _marketData.GetCurrentRate("CHF", fundDto.Currency);
                 fundDto.WorthFiat = fundDto.Amount * fundDto.CurrentFiatRate;
+                fundDto.CoinMeta = await _marketData.GetCoinInfo(fundDto.Currency);
             }
             return fundDtos;
         }
