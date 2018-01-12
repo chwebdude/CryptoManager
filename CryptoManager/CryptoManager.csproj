@@ -34,6 +34,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\environments\environment.prod.ts" />
+    <None Remove="ClientApp\environments\environment.ts" />
     <None Remove="ClientApp\polyfills.ts" />
   </ItemGroup>
 
@@ -44,6 +46,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\environments\environment.prod.ts" />
+    <TypeScriptCompile Include="ClientApp\environments\environment.ts" />
     <TypeScriptCompile Include="ClientApp\polyfills.ts" />
   </ItemGroup>
 
@@ -76,8 +80,8 @@
   <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
     <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
     <Exec Command="yarn install" />
-    <Exec Command="node node_modules/webpack/bin/webpack.js --config webpack.config.vendor.js" /><!-- Todo: Readd - -evn.prod for production build -->
-    <Exec Command="node node_modules/webpack/bin/webpack.js" /><!-- Todo: Readd - -evn.prod for production build -->
+    <Exec Command="node node_modules/webpack/bin/webpack.js --config webpack.config.vendor.js --env.prod" />
+    <Exec Command="node node_modules/webpack/bin/webpack.js --env.prod" />
 
     <!-- Include the newly-built files in the publish output -->
     <ItemGroup>

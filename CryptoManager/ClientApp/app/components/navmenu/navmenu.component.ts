@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from "rxjs";
 import { IntervalObservable } from "rxjs/observable/IntervalObservable";
 import { CryptoApiClient } from '../../services/api-client';
+import { environment } from '../../../environments/environment';
 
 
 @Component({
@@ -63,9 +64,9 @@ export class NavMenuComponent {
   getLatestRelease(): void {
     this.http.get<LatestRelease>("https://api.github.com/repos/chwebdude/CryptoManager/releases/latest")
       .subscribe((res) => {
-        var currentVersion = "0.1.8";
+        var currentVersion = environment.version;
         if (res.name != currentVersion) {
-          console.info("Update available");
+          console.info("Update available. Current version " + currentVersion + ". Available: " + res.name);
           this.updateRelease = res;
         } else {
           localStorage.setItem("lastUpdateCheck", Date.now().toString());
