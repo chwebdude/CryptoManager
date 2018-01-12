@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -35,7 +36,8 @@ namespace CryptoManager
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            var connection = "Data Source = crypto.db";
+            Directory.CreateDirectory("../data");
+            var connection = "Data Source = ../data/crypto.db";
             services.AddDbContext<CryptoContext>(options => options.UseSqlite(connection));
 
             // Add some Swag
