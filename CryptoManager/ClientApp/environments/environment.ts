@@ -5,7 +5,7 @@
 
 export const environment = {
   production: false,
-  version: '(dev)'
+  version: '#{GitVersion_SemVer}#'
 };
 
 
