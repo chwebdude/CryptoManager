@@ -49,8 +49,15 @@
                 </li>
 
                 <li>
-                    <span *ngIf="backgroundTasks > 1" class="badge">{{backgroundTasks}} Background tasks</span>
-                    <span *ngIf="backgroundTasks == 1" class="badge">{{backgroundTasks}} Background task</span>
+                    <span *ngIf="backgroundTasks > 1" class="badge">{{backgroundTasks}} Background tasks running</span>
+                    <span *ngIf="backgroundTasks == 1" class="badge">{{backgroundTasks}} Background task running</span>
+                </li>
+                
+                <li *ngIf="updateRelease != null">
+                    <button type="button" class="btn btn-danger" (click)="openGithubRelease()">
+                        New Version available: <span class="badge badge-light">{{updateRelease.name}}</span>
+                    </button>
+                    
                 </li>
             </ul>
         </div>
