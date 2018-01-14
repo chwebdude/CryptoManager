@@ -32,12 +32,18 @@ namespace CryptoManager
 
         public IConfiguration Configuration { get; }
 
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var rootPath = Directory.GetCurrentDirectory();
+            var parent = Directory.GetParent(rootPath);
+            var dataDir = Path.Combine(parent.FullName, "data");
+            CryptoContext.DatabaseFile = Path.Combine(dataDir, "crypto.db");
+
             services.AddMvc();
-            Directory.CreateDirectory("../data");
-            var connection = "Data Source = ../data/crypto.db";
+            Directory.CreateDirectory(dataDir);
+            var connection = "Data Source = '" + CryptoContext.DatabaseFile + "'";
             services.AddDbContext<CryptoContext>(options => options.UseSqlite(connection));
 
             // Add some Swag
@@ -94,7 +100,7 @@ namespace CryptoManager
             // Enable Hangfire
             app.UseHangfireDashboard();
             app.UseHangfireServer();
-            
+
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
