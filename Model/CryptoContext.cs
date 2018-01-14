@@ -13,7 +13,7 @@ namespace CryptoManager.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=crypto.db");
+            optionsBuilder.UseSqlite("Data Source=../data/crypto.db");
         }
 
         public DbSet<CryptoTransaction> Transactions { get; set; }
