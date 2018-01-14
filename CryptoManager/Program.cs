@@ -7,6 +7,7 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using NLog;
 using NLog.Web;
 
 namespace CryptoManager
@@ -15,10 +16,14 @@ namespace CryptoManager
     {
         public static void Main(string[] args)
         {
-            var logger = NLogBuilder.ConfigureNLog("NLog.config").GetCurrentClassLogger();
+            var rootPath = Directory.GetCurrentDirectory();
+            var nlogConfig = Path.Combine(rootPath, "NLog.config");
+            NLogBuilder.ConfigureNLog(nlogConfig);
+            var logger = LogManager.GetCurrentClassLogger();
+
             try
             {
-                logger.Debug("init main");
+                logger.Debug("Start Webhost");
                 BuildWebHost(args).Run();
             }
             catch (Exception e)
