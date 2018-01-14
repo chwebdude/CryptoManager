@@ -10,10 +10,11 @@ namespace CryptoManager.Models
     public class CryptoContext : DbContext
     {
         public CryptoContext(DbContextOptions<CryptoContext> options) : base(options) { }
+        public static string DatabaseFile;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=../data/crypto.db");
+            optionsBuilder.UseSqlite("Data Source='" + CryptoContext.DatabaseFile + "'");
         }
 
         public DbSet<CryptoTransaction> Transactions { get; set; }
