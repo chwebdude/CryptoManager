@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+#
+echo "`dirname ${BASH_SOURCE[0]}`/bin"
+
+(cd "`dirname ${BASH_SOURCE[0]}`/bin" && ./CryptoManager) &
+
+sleep 5
+echo "Open webpage...."
+open http://localhost:5000
+echo "You can now close this window"
+#
