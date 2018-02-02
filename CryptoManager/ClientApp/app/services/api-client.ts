@@ -575,6 +575,8 @@ export class ExchangeMeta implements IExchangeMeta {
     labelPublicKey?: string | undefined;
     readonly supportsPrivateKey?: boolean | undefined;
     labelPrivateKey?: string | undefined;
+    readonly supportsPassphrase?: boolean | undefined;
+    labelPassphrase?: string | undefined;
 
     constructor(data?: IExchangeMeta) {
         if (data) {
@@ -593,6 +595,8 @@ export class ExchangeMeta implements IExchangeMeta {
             this.labelPublicKey = data["labelPublicKey"];
             (<any>this).supportsPrivateKey = data["supportsPrivateKey"];
             this.labelPrivateKey = data["labelPrivateKey"];
+            (<any>this).supportsPassphrase = data["supportsPassphrase"];
+            this.labelPassphrase = data["labelPassphrase"];
         }
     }
 
@@ -610,6 +614,8 @@ export class ExchangeMeta implements IExchangeMeta {
         data["labelPublicKey"] = this.labelPublicKey;
         data["supportsPrivateKey"] = this.supportsPrivateKey;
         data["labelPrivateKey"] = this.labelPrivateKey;
+        data["supportsPassphrase"] = this.supportsPassphrase;
+        data["labelPassphrase"] = this.labelPassphrase;
         return data; 
     }
 }
@@ -621,6 +627,8 @@ export interface IExchangeMeta {
     labelPublicKey?: string | undefined;
     supportsPrivateKey?: boolean | undefined;
     labelPrivateKey?: string | undefined;
+    supportsPassphrase?: boolean | undefined;
+    labelPassphrase?: string | undefined;
 }
 
 export class ExchangeDTO implements IExchangeDTO {
@@ -675,6 +683,7 @@ export class Exchange implements IExchange {
     comment?: string | undefined;
     publicKey?: string | undefined;
     privateKey?: string | undefined;
+    passphrase?: string | undefined;
     exchangeId?: ExchangeId | undefined;
 
     constructor(data?: IExchange) {
@@ -692,6 +701,7 @@ export class Exchange implements IExchange {
             this.comment = data["comment"];
             this.publicKey = data["publicKey"];
             this.privateKey = data["privateKey"];
+            this.passphrase = data["passphrase"];
             this.exchangeId = data["exchangeId"];
         }
     }
@@ -708,6 +718,7 @@ export class Exchange implements IExchange {
         data["comment"] = this.comment;
         data["publicKey"] = this.publicKey;
         data["privateKey"] = this.privateKey;
+        data["passphrase"] = this.passphrase;
         data["exchangeId"] = this.exchangeId;
         return data; 
     }
@@ -718,6 +729,7 @@ export interface IExchange {
     comment?: string | undefined;
     publicKey?: string | undefined;
     privateKey?: string | undefined;
+    passphrase?: string | undefined;
     exchangeId?: ExchangeId | undefined;
 }
 
@@ -1171,18 +1183,21 @@ export enum ExchangeMetaExchangeId {
     _1 = 1, 
     _2 = 2, 
     _3 = 3, 
+    _4 = 4, 
 }
 
 export enum ExchangeDTOExchange {
     _1 = 1, 
     _2 = 2, 
     _3 = 3, 
+    _4 = 4, 
 }
 
 export enum ExchangeId {
     _1 = 1, 
     _2 = 2, 
     _3 = 3, 
+    _4 = 4, 
 }
 
 export enum CryptoTransactionType {
