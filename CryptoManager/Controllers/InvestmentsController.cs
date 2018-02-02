@@ -33,7 +33,8 @@ namespace CryptoManager.Controllers
         public async Task<AggrInvestmentDTO> Get()
         {
             var aggregation = new AggrInvestmentDTO();
-            var trades = _cryptoContext.Transactions.Where(t => t.Type == TransactionType.Trade);
+            var trades = _cryptoContext.Transactions.Where(t => t.Type == TransactionType.Trade)
+                .OrderByDescending(t => t.DateTime);
             aggregation.Investments = new List<InvestmentDTO>();
             foreach (var trade in trades)
             {
