@@ -14,5 +14,8 @@ namespace Model.Meta
         public string LabelPublicKey { get; set; }
         public bool SupportsPrivateKey => !string.IsNullOrEmpty(LabelPrivateKey);
         public string LabelPrivateKey { get; set; }
+        public bool SupportsPassphrase => !string.IsNullOrEmpty(LabelPassphrase);
+        public string LabelPassphrase { get; set; }
+
     }
 }
