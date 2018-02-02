@@ -26,7 +26,7 @@ namespace CryptoManager.Controllers
         [HttpGet]
         public IEnumerable<CryptoTransaction> Get()
         {
-            return _cryptoContext.Transactions;
+            return _cryptoContext.Transactions.OrderByDescending(t => t.DateTime); ;
         }
 
         [HttpPost("Recalculate")]

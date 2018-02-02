@@ -8,6 +8,7 @@ namespace Model.Enums
     {
         Coinbase = 1,
         Binance = 2,
-        Blockchain = 3
+        Blockchain = 3,
+        Gdax = 4
     }
 }

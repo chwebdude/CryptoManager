@@ -19,6 +19,11 @@
                 <input type="text" class="form-control" id="privateKey" placeholder="{{selectedAvailableExchange.labelPrivateKey}}" [(ngModel)]="privateKey">
             </div>
 
+            <div class="form-group" *ngIf="selectedAvailableExchange.labelPassphrase != null ">
+                <label for="passpharase">{{selectedAvailableExchange.labelPassphrase}}</label>
+                <input type="text" class="form-control" id="passpharase" placeholder="{{selectedAvailableExchange.labelPassphrase}}" [(ngModel)]="passphrase">
+            </div>
+
             <div class="form-group">
                 <label for="comment">Comment</label>
                 <input type="text" class="form-control" id="comment" placeholder="Comment" [(ngModel)]="comment">

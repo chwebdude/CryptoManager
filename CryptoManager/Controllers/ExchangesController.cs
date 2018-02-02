@@ -78,6 +78,15 @@ namespace CryptoManager.Controllers
             if (exchangeMeta.SupportsPublicKey && string.IsNullOrEmpty(value.PublicKey))
                 throw new ArgumentOutOfRangeException(nameof(value.PublicKey), exchangeMeta.LabelPublicKey + " was not provided");
 
+            if (exchangeMeta.SupportsPassphrase && string.IsNullOrEmpty(value.Passphrase))
+                throw new ArgumentOutOfRangeException(nameof(value.Passphrase), exchangeMeta.LabelPassphrase + " was not provided");
+
+            // Triming
+            value.PublicKey = value.PublicKey?.Trim();
+            value.PrivateKey = value.PrivateKey?.Trim();
+            value.Passphrase = value.Passphrase?.Trim();
+            value.Comment = value.Comment?.Trim();
+
             // Add Data
             await _cryptoContext.Exchanges.AddAsync(value);
             await _cryptoContext.SaveChangesAsync();
