@@ -31,20 +31,28 @@ namespace Plugins.Importers.Gdax
                 foreach (var fillResponse in fill)
                 {
                     var buyCurrency = fillResponse.Side == "buy"
-                        ? fillResponse.Product_id.Split('-')[1]
-                        : fillResponse.Product_id.Split('-')[0];
-                    var sellCurrency = fillResponse.Side == "buy"
                         ? fillResponse.Product_id.Split('-')[0]
                         : fillResponse.Product_id.Split('-')[1];
+                    var sellCurrency = fillResponse.Side == "buy"
+                        ? fillResponse.Product_id.Split('-')[1]
+                        : fillResponse.Product_id.Split('-')[0];
+
+                    var buyAmount = fillResponse.Side == "buy"
+                        ? fillResponse.Size
+                        : fillResponse.Size * fillResponse.Price;
+
+                    var sellAmount = fillResponse.Side == "buy"
+                        ? fillResponse.Size * fillResponse.Price
+                        : fillResponse.Size;
 
                     transactions.Add(CryptoTransaction.NewTrade(fillResponse.Trade_id.ToString(), fillResponse.Created_at,
                         exchange.Id,
                         "",
-                        fillResponse.Size,
+                        buyAmount,
                         buyCurrency,
                         fillResponse.Fee,
                         "EUR",
-                        fillResponse.Size * fillResponse.Price,
+                        sellAmount,
                         sellCurrency,
                         await _marketData.GetHistoricRate("CHF", buyCurrency, fillResponse.Created_at)
 
@@ -62,10 +70,11 @@ namespace Plugins.Importers.Gdax
                 foreach (var history in histories)
                 {
                     var transfers = history.Where(h => h.Type == "transfer");
+
                     foreach (var transfer in transfers)
                     {
                         if (transfer.Amount > 0)
-                        {                            
+                        {
                             transactions.Add(CryptoTransaction.NewIn(
                                 transfer.Id,
                                 transfer.Created_at,
@@ -85,14 +94,14 @@ namespace Plugins.Importers.Gdax
                                 transfer.Created_at,
                                 exchange.Id,
                                 "To Coinbase",
-                                transfer.Amount,
+                                transfer.Amount * -1,
                                 account.Currency,
                                 0,
                                 account.Currency,
                                 "GDAX",
                                 "Coinbase",
                                 transfer.Id
-                                ));                            
+                                ));
                         }
                     }
                 }
