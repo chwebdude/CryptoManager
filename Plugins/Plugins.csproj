@@ -13,6 +13,7 @@
     <PackageReference Include="CryptoCompare" Version="0.0.3" />
     <PackageReference Include="BlockchainAPI" Version="4.0.0" />
     <PackageReference Include="FubarCoder.RestSharp.Portable.HttpClient" Version="4.0.8" />
+    <PackageReference Include="GDAX.Api.ClientLibrary" Version="1.0.10" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="NLog" Version="4.5.0-rc04" />
   </ItemGroup>
