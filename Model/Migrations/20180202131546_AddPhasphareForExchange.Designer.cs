@@ -12,9 +12,10 @@ using System;
 namespace Model.Migrations
 {
     [DbContext(typeof(CryptoContext))]
-    partial class CryptoContextModelSnapshot : ModelSnapshot
+    [Migration("20180202131546_AddPhasphareForExchange")]
+    partial class AddPhasphareForExchange
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -110,30 +111,6 @@ namespace Model.Migrations
                     b.ToTable("FiatBalances");
                 });
 
-            modelBuilder.Entity("Model.DbModels.Flow", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<decimal>("Amount");
-
-                    b.Property<string>("Currency");
-
-                    b.Property<DateTime>("DateTime");
-
-                    b.Property<Guid>("ExchangeId");
-
-                    b.Property<Guid?>("FlowId");
-
-                    b.Property<Guid>("TransactionId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FlowId");
-
-                    b.ToTable("Flows");
-                });
-
             modelBuilder.Entity("Model.DbModels.Fund", b =>
                 {
                     b.Property<Guid>("Id")
@@ -159,13 +136,6 @@ namespace Model.Migrations
                     b.HasKey("Key");
 
                     b.ToTable("Settings");
-                });
-
-            modelBuilder.Entity("Model.DbModels.Flow", b =>
-                {
-                    b.HasOne("Model.DbModels.Flow")
-                        .WithMany("Parents")
-                        .HasForeignKey("FlowId");
                 });
 #pragma warning restore 612, 618
         }

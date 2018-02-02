@@ -2,7 +2,11 @@
 <p-dataTable [value]="investments">
 
 
-
+    <p-column styleClass="col-button" header="Date">
+        <ng-template let-inv="rowData" pTemplate="body">
+            {{inv.dateTime | date:'medium'}}
+        </ng-template>
+    </p-column>
 
 
     <p-column styleClass="col-button" header="Buy">
