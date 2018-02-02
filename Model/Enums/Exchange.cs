@@ -9,6 +9,7 @@ namespace Model.Enums
         Coinbase = 1,
         Binance = 2,
         Blockchain = 3,
-        Gdax = 4
+        GDAX = 4,
+        Bity = 5
     }
 }
