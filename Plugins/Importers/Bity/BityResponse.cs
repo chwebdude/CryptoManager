@@ -65,7 +65,7 @@ namespace Plugins.Importers.Bity
     public class Puttransaction
     {
         [JsonProperty("amount")]
-        public string Amount { get; set; }
+        public decimal Amount { get; set; }
 
         [JsonProperty("currency")]
         public string Currency { get; set; }
@@ -77,7 +77,7 @@ namespace Plugins.Importers.Bity
         public string PaymentMethod { get; set; }
 
         [JsonProperty("payment_processor_fee")]
-        public string PaymentProcessorFee { get; set; }
+        public double PaymentProcessorFee { get; set; }
 
         [JsonProperty("reference")]
         public string Reference { get; set; }
