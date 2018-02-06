@@ -38,7 +38,7 @@ namespace Plugins.Importers.Bity
 
             var authResp = await client.Execute(authRequest);
             var token = JsonConvert.DeserializeObject<BityAuthResponse>(authResp.Content);
-            
+
 
             var historyRequest = new RestRequest("/api/v1/order/?limit=100&offset=0&order_by=-timestamp_created", Method.GET);
             historyRequest.AddHeader("Authorization", token.Token_Type + " " + token.Access_Token);
@@ -48,19 +48,64 @@ namespace Plugins.Importers.Bity
             var data = JsonConvert.DeserializeObject<Orders>(historyResponse.Content);
             var executed = data.Objects.Where(o => o.Status == "EXEC");
 
+            var transactions = new List<CryptoTransaction>();
             foreach (var trade in executed)
             {
-                if (trade.Category == "SELL")
-                {
+                var inputCurrency = trade.Inputtransactions.First().Currency;
+                var inputAmount = trade.Inputtransactions.Sum(i => i.Amount);
+                var outputCurrency = trade.Outputtransactions.First().Currency;
+                var outputAmount = trade.Outputtransactions.Sum(o => o.Amount);
+                var fee = trade.Outputtransactions.Sum(o => o.PaymentProcessorFee) +
+                          trade.Inputtransactions.Sum(i => i.PaymentProcessorFee);
+                var date = trade.TimestampCreated;
+                var inputReference = trade.Inputtransactions.First().Reference;
+                var outputReference = trade.Outputtransactions.First().Reference;
+                var fiatRate = await _marketData.GetHistoricRate("CHF", outputCurrency, date);
 
-                }
-                else
-                {
-                    
-                }
+                // Input Transaction
+                transactions.Add(CryptoTransaction.NewIn(
+                    inputReference,
+                    date,
+                    exchange.Id,
+                    "Receving",
+                    inputAmount,
+                    inputCurrency,
+                    inputReference,
+                    string.Empty,
+                    string.Empty
+                    ));
+
+                // Trade
+                transactions.Add(CryptoTransaction.NewTrade(
+                    inputReference + " to " + outputReference,
+                    date,
+                    exchange.Id,
+                    "Trade", outputAmount,
+                    outputCurrency,
+                    (decimal) fee,
+                    "Unknown Currency",
+                    inputAmount,
+                    inputCurrency,
+                    fiatRate
+                    ));
+
+                // Output Transaction
+                transactions.Add(CryptoTransaction.NewOut(
+                    outputReference,
+                    date,
+                    exchange.Id,
+                    "Sending",
+                    outputAmount,
+                    outputCurrency,
+                    (decimal) fee,
+                    "Unknown Currency",
+                    string.Empty,
+                    string.Empty,
+                    outputReference
+                    ));
             }
 
-            throw new NotImplementedException();
+            return transactions;
         }
 
         public ExchangeMeta GetExchangeMeta() => new ExchangeMeta()
