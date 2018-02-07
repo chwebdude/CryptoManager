@@ -25,7 +25,7 @@ export class FlowComponent implements OnInit {
                     : <string>nodes[i].comment + " " + nodes[i].amount + " " + nodes[i].currency;
 
                 this.hierarchialGraph.nodes.push({
-                    id: i.toString(),
+                    id: nodes[i].id,
                     label: label
                 });
 
