@@ -77,6 +77,7 @@ export class FlowComponent implements OnInit {
             source: '1',
             target: '4'
         }
+        
     ];
 
     nodes = [
