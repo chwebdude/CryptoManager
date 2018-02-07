@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import *  as shape from 'd3-shape';
+import { CryptoApiClient, FlowNode } from '../../services/api-client';
 
 
 @Component({
@@ -10,13 +11,28 @@ import *  as shape from 'd3-shape';
 
 export class FlowComponent implements OnInit {
 
-    constructor() {
+    constructor(private apiClient: CryptoApiClient) {
         this.hierarchialGraph = this.getTurbineData();
+        //this.hierarchialGraph = { links: [], nodes: [] };
     }
 
 
     ngOnInit() {
+        this.apiClient.apiFlowsGet().subscribe(nodes => {
+            for (var i = 0; i < nodes.length; i++) {
+                var label = nodes[i].comment == null
+                    ? <number>nodes[i].amount + " " + nodes[i].currency
+                    : <string>nodes[i].comment + " " + nodes[i].amount + " " + nodes[i].currency;
 
+                this.hierarchialGraph.nodes.push({
+                    id: i.toString(),
+                    label: label
+                });
+
+            }
+            this.hierarchialGraph.nodes = [...this.hierarchialGraph.nodes];
+            console.log(this.hierarchialGraph);
+        });
         if (!this.fitContainer) {
             this.applyDimensions();
         }
@@ -30,9 +46,9 @@ export class FlowComponent implements OnInit {
 
     getTurbineData() {
         const nodes = [];
-        const links = [];
+        const links: any[] = [];
 
-       
+
 
         for (var node in this.nodes) {
             nodes.push(this.nodes[node]);
@@ -42,12 +58,12 @@ export class FlowComponent implements OnInit {
             links.push(this.links[key]);
         }
 
-        
+
 
         return { nodes, links };
     }
 
-    
+
     colorScheme = {
         name: 'picnic',
         selectable: false,
@@ -64,48 +80,48 @@ export class FlowComponent implements OnInit {
 
     links = [
         {
-            source: 'start',
-            target: '1',
+            source: 'a0',
+            target: 'a1',
             label: 'links to'
         }, {
-            source: 'start',
-            target: '2'
+            source: 'a0',
+            target: 'a2'
         }, {
-            source: '2',
-            target: '4'
+            source: 'a2',
+            target: 'a4'
         }, {
-            source: '1',
-            target: '4'
+            source: 'a1',
+            target: 'a4'
         }
-        
+
     ];
 
     nodes = [
         {
-            id: 'start',
+            id: 'a0',
             label: '500 EUR'
         }, {
-            id: '1',
+            id: 'a1',
             label: '0.1 BTC',
         }, {
-            id: '2',
+            id: 'a2',
             label: '100 EUR',
-        },  {
-            id: '4',
+        }, {
+            id: 'a4',
             label: '550 EUR'
         }
     ];
 
 
-    
+
 
     hierarchialGraph: { links: any[], nodes: any[] };
 
 
     view: any[];
-    width: number = 700;
-    height: number = 700;
-    fitContainer: boolean = true;
+    width: number = 1200;
+    height: number = 1200;
+    fitContainer: boolean = false;
     autoZoom: boolean = true;
 
     // options
