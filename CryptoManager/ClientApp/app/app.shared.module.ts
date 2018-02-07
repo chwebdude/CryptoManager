@@ -9,6 +9,9 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DropdownModule, ButtonModule, DataTableModule, SharedModule, ConfirmDialogModule, ConfirmationService } from 'primeng/primeng';
 
+import { NgxGraphModule } from '@swimlane/ngx-graph';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
+
 
 import { AppComponent } from './components/app/app.component';
 import { NavMenuComponent } from './components/navmenu/navmenu.component';
@@ -46,6 +49,9 @@ import { CryptoApiClient } from './services/api-client';
         BrowserModule,
         BrowserAnimationsModule,
         HttpClientModule,
+
+        NgxChartsModule,
+        NgxGraphModule,
 
         RouterModule.forRoot([
             { path: '', redirectTo: 'home', pathMatch: 'full' },
