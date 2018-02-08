@@ -243,8 +243,8 @@ namespace BackgroundServices
                                     var oldNode = nodes.Single(n => n.Id == lastBuckets[transaction.InCurrency]);
                                     var newNode = new FlowNode(transaction.DateTime, transaction.InAmount + oldNode.Amount, transaction.InCurrency, exchange.Id, Guid.Empty);
                                     nodes.Add(newNode);
-                                    var link1 = new FlowLink(transaction.DateTime, oldNode.Amount, transaction.InCurrency, oldNode.Id, newNode.Id);
-                                    var link2 = new FlowLink(transaction.DateTime, transaction.InAmount, transaction.InCurrency, sourceNode.Id, newNode.Id, "In");
+                                    var link1 = new FlowLink(transaction.DateTime, oldNode.Amount, transaction.InCurrency, oldNode.Id, newNode.Id, exchange.Id);
+                                    var link2 = new FlowLink(transaction.DateTime, transaction.InAmount, transaction.InCurrency, sourceNode.Id, newNode.Id, exchange.Id, "In");
                                     links.Add(link1);
                                     links.Add(link2);
                                     lastBuckets[transaction.InCurrency] = newNode.Id;
@@ -256,7 +256,7 @@ namespace BackgroundServices
                                     var node = new FlowNode(transaction.DateTime, transaction.InAmount, transaction.InCurrency, exchange.Id, transaction.Id);
                                     nodes.Add(node);
 
-                                    var link = new FlowLink(transaction.DateTime, transaction.InAmount, transaction.InCurrency, sourceNode.Id, node.Id, "In");
+                                    var link = new FlowLink(transaction.DateTime, transaction.InAmount, transaction.InCurrency, sourceNode.Id, node.Id, exchange.Id, "In");
                                     links.Add(link);
                                     lastBuckets.Add(transaction.InCurrency, node.Id);
                                 }
@@ -287,9 +287,9 @@ namespace BackgroundServices
                                     throw new NotImplementedException("Transaction Fee could not be added");
                                 }
 
-                                var linkToNewBuyBucket = new FlowLink(transaction.DateTime, transaction.BuyAmount, transaction.BuyCurrency, prevNode.Id, newBuyBucketNode.Id, $"Trade {Math.Round(transaction.BuyAmount, 2)} {transaction.BuyCurrency} for {Math.Round(transaction.SellAmount, 2)} {transaction.SellCurrency}");
-                                var linkToNewBucket = new FlowLink(transaction.DateTime, buyBucketNode.Amount, buyBucketNode.Currency, buyBucketNode.Id, newBuyBucketNode.Id);
-                                var linkToNewRestBucket = new FlowLink(transaction.DateTime, prevNode.Amount - transaction.SellAmount, transaction.SellCurrency, prevNode.Id, restNode.Id);
+                                var linkToNewBuyBucket = new FlowLink(transaction.DateTime, transaction.BuyAmount, transaction.BuyCurrency, prevNode.Id, newBuyBucketNode.Id, exchange.Id, $"Trade {Math.Round(transaction.BuyAmount, 2)} {transaction.BuyCurrency} for {Math.Round(transaction.SellAmount, 2)} {transaction.SellCurrency}");
+                                var linkToNewBucket = new FlowLink(transaction.DateTime, buyBucketNode.Amount, buyBucketNode.Currency, buyBucketNode.Id, newBuyBucketNode.Id, exchange.Id);
+                                var linkToNewRestBucket = new FlowLink(transaction.DateTime, prevNode.Amount - transaction.SellAmount, transaction.SellCurrency, prevNode.Id, restNode.Id, exchange.Id);
 
                                 // Add data
                                 nodes.Add(restNode);
@@ -325,8 +325,8 @@ namespace BackgroundServices
 
 
                                 // Add Links
-                                var buyLink = new FlowLink(transaction.DateTime, transaction.BuyAmount, transaction.BuyCurrency, prevNode.Id, buyNode.Id, $"Trade {Math.Round(transaction.BuyAmount, 2)} {transaction.BuyCurrency} for {Math.Round(transaction.SellAmount, 2)} {transaction.SellCurrency}");
-                                var sellAndRestLink = new FlowLink(transaction.DateTime, prevNode.Amount - transaction.SellAmount, transaction.SellCurrency, prevNode.Id, sellAndRestNode.Id);
+                                var buyLink = new FlowLink(transaction.DateTime, transaction.BuyAmount, transaction.BuyCurrency, prevNode.Id, buyNode.Id, exchange.Id, $"Trade {Math.Round(transaction.BuyAmount, 2)} {transaction.BuyCurrency} for {Math.Round(transaction.SellAmount, 2)} {transaction.SellCurrency}");
+                                var sellAndRestLink = new FlowLink(transaction.DateTime, prevNode.Amount - transaction.SellAmount, transaction.SellCurrency, prevNode.Id, sellAndRestNode.Id, exchange.Id);
 
                                 // Add to Dictionaries
                                 links.Add(buyLink);
@@ -347,8 +347,8 @@ namespace BackgroundServices
                             var nextNode = new FlowNode(transaction.DateTime, previousNode.Amount - outNode.Amount, transaction.OutCurrency, exchange.Id, Guid.Empty);
                             nodes.Add(nextNode);
 
-                            var linkPreviousOut = new FlowLink(transaction.DateTime, transaction.OutAmount, transaction.OutCurrency, previousNode.Id, outNode.Id, "Out");
-                            var linkPreviousNext = new FlowLink(transaction.DateTime, nextNode.Amount, transaction.OutCurrency, previousNode.Id, nextNode.Id);
+                            var linkPreviousOut = new FlowLink(transaction.DateTime, transaction.OutAmount, transaction.OutCurrency, previousNode.Id, outNode.Id, exchange.Id, "Out");
+                            var linkPreviousNext = new FlowLink(transaction.DateTime, nextNode.Amount, transaction.OutCurrency, previousNode.Id, nextNode.Id, exchange.Id);
                             links.Add(linkPreviousOut);
                             links.Add(linkPreviousNext);
                             lastBuckets[transaction.OutCurrency] = nextNode.Id;
