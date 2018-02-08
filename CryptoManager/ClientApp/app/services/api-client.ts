@@ -358,8 +358,8 @@ export class CryptoApiClient {
     /**
      * @return Success
      */
-    apiFlowsGet(): Observable<FlowNode[]> {
-        let url_ = this.baseUrl + "/api/Flows";
+    apiFlowsNodesGet(): Observable<FlowNodeDTO[]> {
+        let url_ = this.baseUrl + "/api/Flows/Nodes";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -372,20 +372,20 @@ export class CryptoApiClient {
         };
 
         return this.http.request("get", url_, options_).flatMap((response_ : any) => {
-            return this.processApiFlowsGet(response_);
+            return this.processApiFlowsNodesGet(response_);
         }).catch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processApiFlowsGet(<any>response_);
+                    return this.processApiFlowsNodesGet(<any>response_);
                 } catch (e) {
-                    return <Observable<FlowNode[]>><any>Observable.throw(e);
+                    return <Observable<FlowNodeDTO[]>><any>Observable.throw(e);
                 }
             } else
-                return <Observable<FlowNode[]>><any>Observable.throw(response_);
+                return <Observable<FlowNodeDTO[]>><any>Observable.throw(response_);
         });
     }
 
-    protected processApiFlowsGet(response: HttpResponseBase): Observable<FlowNode[]> {
+    protected processApiFlowsNodesGet(response: HttpResponseBase): Observable<FlowNodeDTO[]> {
         const status = response.status;
         const responseBlob = 
             response instanceof HttpResponse ? response.body : 
@@ -399,7 +399,7 @@ export class CryptoApiClient {
             if (resultData200 && resultData200.constructor === Array) {
                 result200 = [];
                 for (let item of resultData200)
-                    result200.push(FlowNode.fromJS(item));
+                    result200.push(FlowNodeDTO.fromJS(item));
             }
             return Observable.of(result200);
             });
@@ -408,7 +408,63 @@ export class CryptoApiClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
-        return Observable.of<FlowNode[]>(<any>null);
+        return Observable.of<FlowNodeDTO[]>(<any>null);
+    }
+
+    /**
+     * @return Success
+     */
+    apiFlowsLinksGet(): Observable<FlowLink[]> {
+        let url_ = this.baseUrl + "/api/Flows/Links";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).flatMap((response_ : any) => {
+            return this.processApiFlowsLinksGet(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processApiFlowsLinksGet(<any>response_);
+                } catch (e) {
+                    return <Observable<FlowLink[]>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<FlowLink[]>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processApiFlowsLinksGet(response: HttpResponseBase): Observable<FlowLink[]> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            response instanceof HttpErrorResponse ? response.error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).flatMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (resultData200 && resultData200.constructor === Array) {
+                result200 = [];
+                for (let item of resultData200)
+                    result200.push(FlowLink.fromJS(item));
+            }
+            return Observable.of(result200);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<FlowLink[]>(<any>null);
     }
 
     /**
@@ -844,15 +900,16 @@ export interface IFiatDTO {
     exchangeId?: string | undefined;
 }
 
-export class FlowNode implements IFlowNode {
+export class FlowNodeDTO implements IFlowNodeDTO {
     id?: string | undefined;
     dateTime?: Date | undefined;
     amount?: number | undefined;
     currency?: string | undefined;
     exchangeId?: string | undefined;
     comment?: string | undefined;
+    transactionId?: string | undefined;
 
-    constructor(data?: IFlowNode) {
+    constructor(data?: IFlowNodeDTO) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -869,11 +926,12 @@ export class FlowNode implements IFlowNode {
             this.currency = data["currency"];
             this.exchangeId = data["exchangeId"];
             this.comment = data["comment"];
+            this.transactionId = data["transactionId"];
         }
     }
 
-    static fromJS(data: any): FlowNode {
-        let result = new FlowNode();
+    static fromJS(data: any): FlowNodeDTO {
+        let result = new FlowNodeDTO();
         result.init(data);
         return result;
     }
@@ -886,17 +944,74 @@ export class FlowNode implements IFlowNode {
         data["currency"] = this.currency;
         data["exchangeId"] = this.exchangeId;
         data["comment"] = this.comment;
+        data["transactionId"] = this.transactionId;
         return data; 
     }
 }
 
-export interface IFlowNode {
+export interface IFlowNodeDTO {
     id?: string | undefined;
     dateTime?: Date | undefined;
     amount?: number | undefined;
     currency?: string | undefined;
     exchangeId?: string | undefined;
     comment?: string | undefined;
+    transactionId?: string | undefined;
+}
+
+export class FlowLink implements IFlowLink {
+    id?: string | undefined;
+    dateTime?: Date | undefined;
+    amount?: number | undefined;
+    currency?: string | undefined;
+    flowNodeSource?: string | undefined;
+    flowNodeTarget?: string | undefined;
+
+    constructor(data?: IFlowLink) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.id = data["id"];
+            this.dateTime = data["dateTime"] ? new Date(data["dateTime"].toString()) : <any>undefined;
+            this.amount = data["amount"];
+            this.currency = data["currency"];
+            this.flowNodeSource = data["flowNodeSource"];
+            this.flowNodeTarget = data["flowNodeTarget"];
+        }
+    }
+
+    static fromJS(data: any): FlowLink {
+        let result = new FlowLink();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["dateTime"] = this.dateTime ? this.dateTime.toISOString() : <any>undefined;
+        data["amount"] = this.amount;
+        data["currency"] = this.currency;
+        data["flowNodeSource"] = this.flowNodeSource;
+        data["flowNodeTarget"] = this.flowNodeTarget;
+        return data; 
+    }
+}
+
+export interface IFlowLink {
+    id?: string | undefined;
+    dateTime?: Date | undefined;
+    amount?: number | undefined;
+    currency?: string | undefined;
+    flowNodeSource?: string | undefined;
+    flowNodeTarget?: string | undefined;
 }
 
 export class FundDTO implements IFundDTO {
