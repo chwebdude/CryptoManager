@@ -8,8 +8,8 @@ install:
 - choco install gitversion.portable -pre -y
 cache:
  - "%LOCALAPPDATA%\\Yarn"
- before_build:  
-  - ps: gitversion /l console /output buildserver
+before_build:  
+- ps: gitversion /l console /output buildserver
 build_script:
 - cmd: >-
     dotnet --version
