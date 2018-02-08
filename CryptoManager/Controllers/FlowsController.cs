@@ -24,17 +24,16 @@ namespace CryptoManager.Controllers
             _mapper = mapper;
         }
 
-        // Todo: Filter by Exchange
         [HttpGet("Nodes")]
-        public async Task<IEnumerable<FlowNodeDTO>> GetNodes()
+        public async Task<IEnumerable<FlowNodeDTO>> GetNodes(Guid exchangeId)
         {
-            return await Task.Run(() => _mapper.Map<IEnumerable<FlowNodeDTO>>(_context.FlowNodes));
+            return await Task.Run(() => _mapper.Map<IEnumerable<FlowNodeDTO>>(_context.FlowNodes.Where(f => f.ExchangeId == exchangeId)));
         }
 
         [HttpGet("Links")]
-        public async Task<IEnumerable<FlowLink>> GetLinks()
+        public async Task<IEnumerable<FlowLink>> GetLinks(Guid exchangeId)
         {
-            var res = await Task.Run(() => _mapper.Map<IEnumerable<FlowLinkDTO>>(_context.FlowLinks));
+            var res = await Task.Run(() => _mapper.Map<IEnumerable<FlowLinkDTO>>(_context.FlowLinks.Where(f => f.ExchangeId == exchangeId)));
             return res;
         }
     }
