@@ -358,8 +358,12 @@ export class CryptoApiClient {
     /**
      * @return Success
      */
-    apiFlowsNodesGet(): Observable<FlowNodeDTO[]> {
-        let url_ = this.baseUrl + "/api/Flows/Nodes";
+    apiFlowsNodesGet(exchangeId: string): Observable<FlowNodeDTO[]> {
+        let url_ = this.baseUrl + "/api/Flows/Nodes?";
+        if (exchangeId === undefined || exchangeId === null)
+            throw new Error("The parameter 'exchangeId' must be defined and cannot be null.");
+        else
+            url_ += "exchangeId=" + encodeURIComponent("" + exchangeId) + "&"; 
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -414,8 +418,12 @@ export class CryptoApiClient {
     /**
      * @return Success
      */
-    apiFlowsLinksGet(): Observable<FlowLink[]> {
-        let url_ = this.baseUrl + "/api/Flows/Links";
+    apiFlowsLinksGet(exchangeId: string): Observable<FlowLink[]> {
+        let url_ = this.baseUrl + "/api/Flows/Links?";
+        if (exchangeId === undefined || exchangeId === null)
+            throw new Error("The parameter 'exchangeId' must be defined and cannot be null.");
+        else
+            url_ += "exchangeId=" + encodeURIComponent("" + exchangeId) + "&"; 
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -967,6 +975,7 @@ export class FlowLink implements IFlowLink {
     flowNodeSource?: string | undefined;
     flowNodeTarget?: string | undefined;
     comment?: string | undefined;
+    exchangeId?: string | undefined;
 
     constructor(data?: IFlowLink) {
         if (data) {
@@ -986,6 +995,7 @@ export class FlowLink implements IFlowLink {
             this.flowNodeSource = data["flowNodeSource"];
             this.flowNodeTarget = data["flowNodeTarget"];
             this.comment = data["comment"];
+            this.exchangeId = data["exchangeId"];
         }
     }
 
@@ -1004,6 +1014,7 @@ export class FlowLink implements IFlowLink {
         data["flowNodeSource"] = this.flowNodeSource;
         data["flowNodeTarget"] = this.flowNodeTarget;
         data["comment"] = this.comment;
+        data["exchangeId"] = this.exchangeId;
         return data; 
     }
 }
@@ -1016,6 +1027,7 @@ export interface IFlowLink {
     flowNodeSource?: string | undefined;
     flowNodeTarget?: string | undefined;
     comment?: string | undefined;
+    exchangeId?: string | undefined;
 }
 
 export class FundDTO implements IFundDTO {
