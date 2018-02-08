@@ -22,5 +22,7 @@ namespace CryptoManager.Models
         public DbSet<Exchange> Exchanges { get; set; }
         public DbSet<Fund> Funds { get; set; }
         public DbSet<FiatBalance> FiatBalances{ get; set; }
+        public DbSet<FlowNode> FlowNodes { get; set; }
+        public DbSet<FlowLink> FlowLinks { get; set; }
     }
 }
