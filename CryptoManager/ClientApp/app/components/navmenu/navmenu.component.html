@@ -42,6 +42,12 @@
                     </a>
                 </li>
 
+                <li [routerLinkActive]="['link-active']">
+                    <a [routerLink]="['/flow']">
+                        <span class="glyphicon glyphicon-random"></span> Flow
+                    </a>
+                </li>
+
                 <li>
                     <a (click)="recalculate()" href="javascript:void(0)">
                         <span class="glyphicon glyphicon-refresh"></span> Recalculate
@@ -52,12 +58,12 @@
                     <span *ngIf="backgroundTasks > 1" class="badge">{{backgroundTasks}} Background tasks running</span>
                     <span *ngIf="backgroundTasks == 1" class="badge">{{backgroundTasks}} Background task running</span>
                 </li>
-                
+
                 <li *ngIf="updateRelease != null">
                     <button type="button" class="btn btn-danger" (click)="openGithubRelease()">
                         New Version available: <span class="badge badge-light">{{updateRelease.name}}</span>
                     </button>
-                    
+
                 </li>
             </ul>
         </div>
