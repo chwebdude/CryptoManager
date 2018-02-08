@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import *  as shape from 'd3-shape';
-import { CryptoApiClient, FlowNode } from '../../services/api-client';
+import { CryptoApiClient } from '../../services/api-client';
 
 
 @Component({
@@ -12,17 +12,19 @@ import { CryptoApiClient, FlowNode } from '../../services/api-client';
 export class FlowComponent implements OnInit {
 
     constructor(private apiClient: CryptoApiClient) {
-        this.hierarchialGraph = this.getTurbineData();
-        //this.hierarchialGraph = { links: [], nodes: [] };
+        const nodes: any[] = [];
+        const links: any[] = [];
+        this.hierarchialGraph = { nodes, links };
     }
 
 
     ngOnInit() {
-        this.apiClient.apiFlowsGet().subscribe(nodes => {
+        this.apiClient.apiFlowsNodesGet().subscribe(nodes => {
             for (var i = 0; i < nodes.length; i++) {
                 var label = nodes[i].comment == null
                     ? <number>nodes[i].amount + " " + nodes[i].currency
                     : <string>nodes[i].comment + " " + nodes[i].amount + " " + nodes[i].currency;
+
 
                 this.hierarchialGraph.nodes.push({
                     id: nodes[i].id,
@@ -31,8 +33,24 @@ export class FlowComponent implements OnInit {
 
             }
             this.hierarchialGraph.nodes = [...this.hierarchialGraph.nodes];
-            console.log(this.hierarchialGraph);
+
+            this.apiClient.apiFlowsLinksGet().subscribe(links => {
+                for (var i = 0; i < links.length; i++) {
+
+                    this.hierarchialGraph.links.push({
+                        source: links[i].flowNodeSource,
+                        target: links[i].flowNodeTarget,
+                        label: ''
+                    });
+
+                }
+
+                this.hierarchialGraph.links = [...this.hierarchialGraph.links];
+            });
         });
+
+
+
         if (!this.fitContainer) {
             this.applyDimensions();
         }
@@ -42,26 +60,7 @@ export class FlowComponent implements OnInit {
         this.view = [this.width, this.height];
     }
 
-    cache: any = {};
-
-    getTurbineData() {
-        const nodes = [];
-        const links: any[] = [];
-
-
-
-        for (var node in this.nodes) {
-            nodes.push(this.nodes[node]);
-        }
-
-        for (var key in this.links) {
-            links.push(this.links[key]);
-        }
-
-
-
-        return { nodes, links };
-    }
+  
 
 
     colorScheme = {
@@ -77,43 +76,7 @@ export class FlowComponent implements OnInit {
     curveType: string = 'Linear';
     curve: any = shape.curveBundle.beta(1);
 
-
-    links = [
-        {
-            source: 'a0',
-            target: 'a1',
-            label: 'links to'
-        }, {
-            source: 'a0',
-            target: 'a2'
-        }, {
-            source: 'a2',
-            target: 'a4'
-        }, {
-            source: 'a1',
-            target: 'a4'
-        }
-
-    ];
-
-    nodes = [
-        {
-            id: 'a0',
-            label: '500 EUR'
-        }, {
-            id: 'a1',
-            label: '0.1 BTC',
-        }, {
-            id: 'a2',
-            label: '100 EUR',
-        }, {
-            id: 'a4',
-            label: '550 EUR'
-        }
-    ];
-
-
-
+    
 
     hierarchialGraph: { links: any[], nodes: any[] };
 
