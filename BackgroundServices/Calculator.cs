@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CryptoManager.Models;
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Model.DbModels;
 using Model.Enums;
@@ -20,6 +21,8 @@ namespace BackgroundServices
 
         public void RecalculateAll()
         {
+            BackgroundJob.Enqueue<Calculator>(c => c.CalculateFlow());
+
             var transactions = _context.Transactions;
             var wallets = new Dictionary<Guid, Dictionary<string, decimal>>();
             //var fiatInvestments = new Dictionary<Guid, Dictionary<string, decimal>>();
