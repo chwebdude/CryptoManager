@@ -270,13 +270,28 @@ namespace BackgroundServices
                                 var prevNode = nodes.Single(n => n.Id == lastBuckets[transaction.SellCurrency]);
                                 var restNode = new FlowNode(transaction.DateTime, prevNode.Amount - transaction.SellAmount, transaction.SellCurrency, exchange.Id, transaction.Id);
                                 var newBuyBucketNode = new FlowNode(transaction.DateTime, buyBucketNode.Amount + transaction.BuyAmount, buyBucketNode.Currency, exchange.Id, transaction.Id);
-                                nodes.Add(restNode);
-                                nodes.Add(newBuyBucketNode);
+
+                                // Calculate fee
+                                if (transaction.FeeCurrency == prevNode.Currency)
+                                {
+                                    restNode.Amount -= transaction.FeeAmount;
+                                }
+                                else if (transaction.FeeCurrency == newBuyBucketNode.Currency)
+                                {
+                                    newBuyBucketNode.Amount -= transaction.FeeAmount;
+                                }
+                                else
+                                {
+                                    throw new NotImplementedException("Transaction Fee could not be added");
+                                }
 
                                 var linkToNewBuyBucket = new FlowLink(transaction.DateTime, transaction.BuyAmount, transaction.BuyCurrency, prevNode.Id, newBuyBucketNode.Id, $"Trade {Math.Round(transaction.BuyAmount, 2)} {transaction.BuyCurrency} for {Math.Round(transaction.SellAmount, 2)} {transaction.SellCurrency}");
                                 var linkToNewBucket = new FlowLink(transaction.DateTime, buyBucketNode.Amount, buyBucketNode.Currency, buyBucketNode.Id, newBuyBucketNode.Id);
                                 var linkToNewRestBucket = new FlowLink(transaction.DateTime, prevNode.Amount - transaction.SellAmount, transaction.SellCurrency, prevNode.Id, restNode.Id);
 
+                                // Add data
+                                nodes.Add(restNode);
+                                nodes.Add(newBuyBucketNode);
                                 links.Add(linkToNewBuyBucket);
                                 links.Add(linkToNewBucket);
                                 links.Add(linkToNewRestBucket);
@@ -291,15 +306,31 @@ namespace BackgroundServices
                                 var prevNode = nodes.Single(n => n.Id == lastBuckets[transaction.SellCurrency]);
                                 var buyNode = new FlowNode(transaction.DateTime, transaction.BuyAmount, transaction.BuyCurrency, exchange.Id, transaction.Id);
                                 var sellAndRestNode = new FlowNode(transaction.DateTime, prevNode.Amount - transaction.SellAmount, transaction.SellCurrency, exchange.Id, transaction.Id);
-                                nodes.Add(buyNode);
-                                nodes.Add(sellAndRestNode);
+
+                                // Calculate fee
+                                if (transaction.FeeCurrency == prevNode.Currency)
+                                {
+                                    sellAndRestNode.Amount -= transaction.FeeAmount;
+                                }
+                                else if (transaction.FeeCurrency == buyNode.Currency)
+                                {
+                                    buyNode.Amount -= transaction.FeeAmount;
+                                }
+                                else
+                                {
+                                    throw new NotImplementedException("Transaction Fee could not be added");
+                                }
 
 
                                 // Add Links
                                 var buyLink = new FlowLink(transaction.DateTime, transaction.BuyAmount, transaction.BuyCurrency, prevNode.Id, buyNode.Id, $"Trade {Math.Round(transaction.BuyAmount, 2)} {transaction.BuyCurrency} for {Math.Round(transaction.SellAmount, 2)} {transaction.SellCurrency}");
                                 var sellAndRestLink = new FlowLink(transaction.DateTime, prevNode.Amount - transaction.SellAmount, transaction.SellCurrency, prevNode.Id, sellAndRestNode.Id);
+
+                                // Add to Dictionaries
                                 links.Add(buyLink);
                                 links.Add(sellAndRestLink);
+                                nodes.Add(buyNode);
+                                nodes.Add(sellAndRestNode);
 
                                 // Set new Buckets
                                 lastBuckets[transaction.BuyCurrency] = buyNode.Id;
