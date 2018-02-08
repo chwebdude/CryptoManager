@@ -3,9 +3,12 @@
     .edge-label {
         fill: black !important;
     }
-
 </style>
-<div style="position: absolute; top: 50px; left: 50px; right: 50px; bottom: 50px;">
+<div>
+    <p-dropdown [options]="exchanges" [(ngModel)]="selectedExchange" (onChange)="exchangeChanged()"></p-dropdown>
+</div>
+
+<div style="border: 1px solid lightgray; min-height: 800px; margin-top: 15px">
     <ngx-graph class="chart-container"
                [view]="view"
                [autoZoom]="autoZoom"
