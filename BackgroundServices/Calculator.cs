@@ -6,17 +6,19 @@ using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Model.DbModels;
 using Model.Enums;
+using Plugins;
 
 namespace BackgroundServices
 {
     public class Calculator
     {
         private readonly CryptoContext _context;
-        private static readonly string[] FiatCurrencies = { "EUR", "CHF", "USD" };
+        private readonly IMarketData _marketData;
 
-        public Calculator(CryptoContext context)
+        public Calculator(CryptoContext context, IMarketData marketData)
         {
             _context = context;
+            _marketData = marketData;
         }
 
         public void RecalculateAll()
@@ -85,7 +87,7 @@ namespace BackgroundServices
                         }
 
                         // Is this a FiatBalance 
-                        if (FiatCurrencies.Contains(transaction.InCurrency))
+                        if (_marketData.IsFiat(transaction.InCurrency))
                         {
                             if (fiatEx.ContainsKey(transaction.InCurrency))
                             {
@@ -112,7 +114,7 @@ namespace BackgroundServices
                         }
 
                         // Is this a FiatBalance 
-                        if (FiatCurrencies.Contains(transaction.OutCurrency))
+                        if (_marketData.IsFiat(transaction.OutCurrency))
                         {
                             if (fiatEx.ContainsKey(transaction.OutCurrency))
                             {
