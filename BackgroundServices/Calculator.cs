@@ -233,34 +233,57 @@ namespace BackgroundServices
 
                 foreach (var transaction in transactions)
                 {
-                    if (transaction.Type == TransactionType.In)
+                    switch (transaction.Type)
                     {
-                        if (lastBuckets.ContainsKey(transaction.InCurrency))
-                        {
-                            // Add Amount to new Bucket
-                            var sourceNode = nodes.Single(n => n.DateTime == transaction.DateTime && n.Amount == transaction.InAmount);
+                        case TransactionType.In:
+                            {
+                                if (lastBuckets.ContainsKey(transaction.InCurrency))
+                                {
+                                    // Add Amount to new Bucket
+                                    var sourceNode = nodes.Single(n => n.DateTime == transaction.DateTime && n.Amount == transaction.InAmount);
 
-                            var oldNode = nodes.Single(n => n.Id == lastBuckets[transaction.InCurrency]);
-                            var newNode = new FlowNode(transaction.DateTime, transaction.InAmount + oldNode.Amount, transaction.InCurrency, exchange.Id, transaction.Id);
-                            nodes.Add(newNode);
-                            var link1 = new FlowLink(transaction.DateTime, oldNode.Amount, transaction.InCurrency, oldNode.Id, newNode.Id);
-                            var link2 = new FlowLink(transaction.DateTime, transaction.InAmount, transaction.InCurrency, sourceNode.Id, newNode.Id);
-                            links.Add(link1);
-                            links.Add(link2);
-                            lastBuckets[transaction.InCurrency] = newNode.Id;
+                                    var oldNode = nodes.Single(n => n.Id == lastBuckets[transaction.InCurrency]);
+                                    var newNode = new FlowNode(transaction.DateTime, transaction.InAmount + oldNode.Amount, transaction.InCurrency, exchange.Id, Guid.Empty);
+                                    nodes.Add(newNode);
+                                    var link1 = new FlowLink(transaction.DateTime, oldNode.Amount, transaction.InCurrency, oldNode.Id, newNode.Id);
+                                    var link2 = new FlowLink(transaction.DateTime, transaction.InAmount, transaction.InCurrency, sourceNode.Id, newNode.Id);
+                                    links.Add(link1);
+                                    links.Add(link2);
+                                    lastBuckets[transaction.InCurrency] = newNode.Id;
 
-                        }
-                        else
-                        {
-                            var sourceNode = nodes.Single(n => n.TransactionId == transaction.Id);
-                            var node = new FlowNode(transaction.DateTime, transaction.InAmount, transaction.InCurrency, exchange.Id, transaction.Id);
-                            nodes.Add(node);
+                                }
+                                else
+                                {
+                                    var sourceNode = nodes.Single(n => n.TransactionId == transaction.Id);
+                                    var node = new FlowNode(transaction.DateTime, transaction.InAmount, transaction.InCurrency, exchange.Id, transaction.Id);
+                                    nodes.Add(node);
 
-                            var link = new FlowLink(transaction.DateTime, transaction.InAmount, transaction.InCurrency,
-                                sourceNode.Id, node.Id);
-                            links.Add(link);
-                            lastBuckets.Add(transaction.InCurrency, node.Id);
-                        }
+                                    var link = new FlowLink(transaction.DateTime, transaction.InAmount, transaction.InCurrency,
+                                        sourceNode.Id, node.Id);
+                                    links.Add(link);
+                                    lastBuckets.Add(transaction.InCurrency, node.Id);
+                                }
+                            }
+
+                            break;
+                        case TransactionType.Trade:
+                            break;
+                        case TransactionType.Out:
+                            var previousNode = nodes.Single(n => n.Id == lastBuckets[transaction.OutCurrency]);
+
+                            var outNode = nodes.Single(n => n.TransactionId == transaction.Id);
+                            var nextNode = new FlowNode(transaction.DateTime, previousNode.Amount - outNode.Amount, transaction.OutCurrency, exchange.Id, Guid.Empty);
+                            nodes.Add(nextNode);
+
+                            var linkPreviousOut = new FlowLink(transaction.DateTime, transaction.OutAmount, transaction.OutCurrency, previousNode.Id, outNode.Id);
+                            var linkPreviousNext = new FlowLink(transaction.DateTime, nextNode.Amount, transaction.OutCurrency, previousNode.Id, nextNode.Id);
+                            links.Add(linkPreviousOut);
+                            links.Add(linkPreviousNext);
+                            lastBuckets[transaction.OutCurrency] = nextNode.Id;
+
+                            break;
+                        default:
+                            throw new ArgumentException($"Transaction Type {transaction.Type} is unknown");
                     }
                 }
 
