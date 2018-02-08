@@ -202,7 +202,7 @@ namespace BackgroundServices
             _context.FlowLinks.RemoveRange(_context.FlowLinks);
             _context.SaveChanges();
 
-            
+
             // Initialize Buckets per Exchange
             var allNodes = new Dictionary<Guid, IEnumerable<FlowNode>>();
             var allLinks = new Dictionary<Guid, IEnumerable<FlowLink>>();
@@ -214,25 +214,55 @@ namespace BackgroundServices
 
                 // Add all Inputs
                 var inputs =
-                    _context.Transactions.Where(t => t.ExchangeId == exchange.Id && t.Type == TransactionType.In);
+                    _context.Transactions.Where(t => t.ExchangeId == exchange.Id && t.Type == TransactionType.In).OrderBy(t => t.DateTime);
                 foreach (var input in inputs)
                 {
-                    nodes.Add(new FlowNode(input.DateTime, input.InAmount, input.InCurrency, exchange.Id, "In"));
+                    nodes.Add(new FlowNode(input.DateTime, input.InAmount, input.InCurrency, exchange.Id, input.Id, "In"));
                 }
 
                 // Add all Outputs
-                var outputs = _context.Transactions.Where(t => t.ExchangeId == exchange.Id && t.Type == TransactionType.Out);
+                var outputs = _context.Transactions.Where(t => t.ExchangeId == exchange.Id && t.Type == TransactionType.Out).OrderBy(t => t.DateTime);
                 foreach (var output in outputs)
                 {
-                    nodes.Add(new FlowNode(output.DateTime, output.OutAmount, output.OutCurrency, exchange.Id, "Out"));
+                    nodes.Add(new FlowNode(output.DateTime, output.OutAmount, output.OutCurrency, exchange.Id, output.Id, "Out"));
                 }
 
-                //var transactions = _context.Transactions.Where(t => t.ExchangeId == exchange.Id).OrderBy(t => t.DateTime);
+                var transactions = _context.Transactions.Where(t => t.ExchangeId == exchange.Id).OrderBy(t => t.DateTime);
 
-                //foreach (var transaction in transactions)
-                //{
-                    
-                //}
+                var lastBuckets = new Dictionary<string, Guid>(); // Currency/FlowNode Id
+
+                foreach (var transaction in transactions)
+                {
+                    if (transaction.Type == TransactionType.In)
+                    {
+                        if (lastBuckets.ContainsKey(transaction.InCurrency))
+                        {
+                            // Add Amount to new Bucket
+                            var sourceNode = nodes.Single(n => n.DateTime == transaction.DateTime && n.Amount == transaction.InAmount);
+
+                            var oldNode = nodes.Single(n => n.Id == lastBuckets[transaction.InCurrency]);
+                            var newNode = new FlowNode(transaction.DateTime, transaction.InAmount + oldNode.Amount, transaction.InCurrency, exchange.Id, transaction.Id);
+                            nodes.Add(newNode);
+                            var link1 = new FlowLink(transaction.DateTime, oldNode.Amount, transaction.InCurrency, oldNode.Id, newNode.Id);
+                            var link2 = new FlowLink(transaction.DateTime, transaction.InAmount, transaction.InCurrency, sourceNode.Id, newNode.Id);
+                            links.Add(link1);
+                            links.Add(link2);
+                            lastBuckets[transaction.InCurrency] = newNode.Id;
+
+                        }
+                        else
+                        {
+                            var sourceNode = nodes.Single(n => n.TransactionId == transaction.Id);
+                            var node = new FlowNode(transaction.DateTime, transaction.InAmount, transaction.InCurrency, exchange.Id, transaction.Id);
+                            nodes.Add(node);
+
+                            var link = new FlowLink(transaction.DateTime, transaction.InAmount, transaction.InCurrency,
+                                sourceNode.Id, node.Id);
+                            links.Add(link);
+                            lastBuckets.Add(transaction.InCurrency, node.Id);
+                        }
+                    }
+                }
 
 
                 allNodes.Add(exchange.Id, nodes);

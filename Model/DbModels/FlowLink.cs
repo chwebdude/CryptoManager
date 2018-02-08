@@ -6,7 +6,19 @@ namespace Model.DbModels
 {
    public class FlowLink
     {
-        public FlowLink() { }
+        public FlowLink(DateTime dateTime, decimal amount, string currency, Guid flowNodeSource, Guid flowNodeTarget)
+        {
+            DateTime = dateTime;
+            Amount = amount;
+            Currency = currency;
+            FlowNodeSource = flowNodeSource;
+            FlowNodeTarget = flowNodeTarget;
+            Id = Guid.NewGuid();
+        }
+        public FlowLink()
+        {
+            
+        }
         public Guid Id { get; set; }
         public DateTime DateTime { get; set; }
         public decimal Amount { get; set; }
