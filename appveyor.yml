@@ -5,8 +5,11 @@ init:
 - cmd: git config --global core.autocrlf true
 install:
 - ps: Install-Product node ''
+- choco install gitversion.portable -pre -y
 cache:
- - "%LOCALAPPDATA%\\Yarn" 
+ - "%LOCALAPPDATA%\\Yarn"
+ before_build:  
+  - ps: gitversion /l console /output buildserver
 build_script:
 - cmd: >-
     dotnet --version
