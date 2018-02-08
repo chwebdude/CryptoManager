@@ -40,7 +40,7 @@ export class FlowComponent implements OnInit {
                     this.hierarchialGraph.links.push({
                         source: links[i].flowNodeSource,
                         target: links[i].flowNodeTarget,
-                        label: ''
+                        label: links[i].comment
                     });
 
                 }

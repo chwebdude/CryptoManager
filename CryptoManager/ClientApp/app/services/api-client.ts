@@ -966,6 +966,7 @@ export class FlowLink implements IFlowLink {
     currency?: string | undefined;
     flowNodeSource?: string | undefined;
     flowNodeTarget?: string | undefined;
+    comment?: string | undefined;
 
     constructor(data?: IFlowLink) {
         if (data) {
@@ -984,6 +985,7 @@ export class FlowLink implements IFlowLink {
             this.currency = data["currency"];
             this.flowNodeSource = data["flowNodeSource"];
             this.flowNodeTarget = data["flowNodeTarget"];
+            this.comment = data["comment"];
         }
     }
 
@@ -1001,6 +1003,7 @@ export class FlowLink implements IFlowLink {
         data["currency"] = this.currency;
         data["flowNodeSource"] = this.flowNodeSource;
         data["flowNodeTarget"] = this.flowNodeTarget;
+        data["comment"] = this.comment;
         return data; 
     }
 }
@@ -1012,6 +1015,7 @@ export interface IFlowLink {
     currency?: string | undefined;
     flowNodeSource?: string | undefined;
     flowNodeTarget?: string | undefined;
+    comment?: string | undefined;
 }
 
 export class FundDTO implements IFundDTO {
