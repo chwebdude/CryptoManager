@@ -212,23 +212,16 @@ namespace BackgroundServices
 
             foreach (var exchange in _context.Exchanges)
             {
-                var nodes = new List<FlowNode>();
                 var links = new List<FlowLink>();
 
                 // Add all Inputs
                 var inputs =
                     _context.Transactions.Where(t => t.ExchangeId == exchange.Id && t.Type == TransactionType.In).OrderBy(t => t.DateTime);
-                foreach (var input in inputs)
-                {
-                    nodes.Add(new FlowNode(input.DateTime, input.InAmount, input.InCurrency, exchange.Id, input.Id, "In"));
-                }
+                var nodes = inputs.Select(input => new FlowNode(input.DateTime, input.InAmount, input.InCurrency, exchange.Id, input.Id, "In")).ToList();
 
                 // Add all Outputs
                 var outputs = _context.Transactions.Where(t => t.ExchangeId == exchange.Id && t.Type == TransactionType.Out).OrderBy(t => t.DateTime);
-                foreach (var output in outputs)
-                {
-                    nodes.Add(new FlowNode(output.DateTime, output.OutAmount, output.OutCurrency, exchange.Id, output.Id, "Out"));
-                }
+                nodes.AddRange(outputs.Select(output => new FlowNode(output.DateTime, output.OutAmount, output.OutCurrency, exchange.Id, output.Id, "Out")));
 
                 var transactions = _context.Transactions.Where(t => t.ExchangeId == exchange.Id).OrderBy(t => t.DateTime);
 
@@ -268,6 +261,7 @@ namespace BackgroundServices
                             }
 
                             break;
+
                         case TransactionType.Trade:
                             if (lastBuckets.ContainsKey(transaction.BuyCurrency))
                             {
@@ -279,7 +273,7 @@ namespace BackgroundServices
                                 nodes.Add(restNode);
                                 nodes.Add(newBuyBucketNode);
 
-                                var linkToNewBuyBucket = new FlowLink(transaction.DateTime, transaction.BuyAmount, transaction.BuyCurrency, prevNode.Id, newBuyBucketNode.Id, "Buy");
+                                var linkToNewBuyBucket = new FlowLink(transaction.DateTime, transaction.BuyAmount, transaction.BuyCurrency, prevNode.Id, newBuyBucketNode.Id, $"Trade {Math.Round(transaction.BuyAmount, 2)} {transaction.BuyCurrency} for {Math.Round(transaction.SellAmount, 2)} {transaction.SellCurrency}");
                                 var linkToNewBucket = new FlowLink(transaction.DateTime, buyBucketNode.Amount, buyBucketNode.Currency, buyBucketNode.Id, newBuyBucketNode.Id);
                                 var linkToNewRestBucket = new FlowLink(transaction.DateTime, prevNode.Amount - transaction.SellAmount, transaction.SellCurrency, prevNode.Id, restNode.Id);
 
@@ -302,7 +296,7 @@ namespace BackgroundServices
 
 
                                 // Add Links
-                                var buyLink = new FlowLink(transaction.DateTime, transaction.BuyAmount, transaction.BuyCurrency, prevNode.Id, buyNode.Id, "Buy");
+                                var buyLink = new FlowLink(transaction.DateTime, transaction.BuyAmount, transaction.BuyCurrency, prevNode.Id, buyNode.Id, $"Trade {Math.Round(transaction.BuyAmount, 2)} {transaction.BuyCurrency} for {Math.Round(transaction.SellAmount, 2)} {transaction.SellCurrency}");
                                 var sellAndRestLink = new FlowLink(transaction.DateTime, prevNode.Amount - transaction.SellAmount, transaction.SellCurrency, prevNode.Id, sellAndRestNode.Id);
                                 links.Add(buyLink);
                                 links.Add(sellAndRestLink);
@@ -311,9 +305,8 @@ namespace BackgroundServices
                                 lastBuckets[transaction.BuyCurrency] = buyNode.Id;
                                 lastBuckets[transaction.SellCurrency] = sellAndRestNode.Id;
                             }
-
-
                             break;
+
                         case TransactionType.Out:
                             var previousNode = nodes.Single(n => n.Id == lastBuckets[transaction.OutCurrency]);
 
@@ -328,6 +321,7 @@ namespace BackgroundServices
                             lastBuckets[transaction.OutCurrency] = nextNode.Id;
 
                             break;
+
                         default:
                             throw new ArgumentException($"Transaction Type {transaction.Type} is unknown");
                     }
@@ -339,69 +333,6 @@ namespace BackgroundServices
             }
 
 
-
-
-
-
-
-
-
-
-
-
-
-            //foreach (var transaction in transactions)
-            //{
-            //    var flow = new FlowNode()
-            //    {
-            //        TransactionId = transaction.Id,
-            //        DateTime = transaction.DateTime,
-            //    };
-            //    switch (transaction.Type)
-            //    {
-            //        case TransactionType.Trade:
-            //            break;
-            //        case TransactionType.In:
-            //            // Search for Sender 
-            //            var senderTransaction =
-            //                _context.Transactions.SingleOrDefault(t => !string.IsNullOrEmpty(t.TransactionHash) && t.TransactionHash == transaction.TransactionHash && t.Id != transaction.Id);
-            //            flow.Amount = transaction.InAmount;
-            //            flow.Currency = transaction.InCurrency;
-            //            flow.ExchangeId = transaction.ExchangeId;
-
-            //            if (senderTransaction != null)
-            //            {
-            //                var parentFlow = _context.Flows.Single(f => f.TransactionId == senderTransaction.Id);
-            //                flow.Parents = new List<FlowNode>() { parentFlow };
-            //            }
-
-            //            break;
-            //        case TransactionType.Out:
-            //            flow.Amount = transaction.OutAmount;
-            //            flow.Currency = transaction.OutCurrency;
-
-            //            //Todo: Get last from time
-            //            var lastFlow = _context.Flows.First(f =>
-            //                f.Currency == flow.Currency && f.ExchangeId == transaction.ExchangeId);
-            //            flow.Parents = new List<FlowNode>() { lastFlow };
-
-            //            //Todo: Determine Exchange
-            //            break;
-            //        default:
-            //            throw new ArgumentOutOfRangeException();
-            //    }
-
-            //    _context.Flows.Add(flow);
-
-            //}
-
-            //var start = transactions.First();
-            //_context.Flows.Add(new FlowNode
-            //{
-            //    DateTime = start.DateTime,
-            //    Amount = start.BuyAmount,
-            //    Currency = start.BuyCurrency
-            //});
 
             // Save Data
             foreach (var allNode in allNodes)
