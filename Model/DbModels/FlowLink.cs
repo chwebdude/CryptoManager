@@ -6,7 +6,7 @@ namespace Model.DbModels
 {
    public class FlowLink
     {
-        public FlowLink(DateTime dateTime, decimal amount, string currency, Guid flowNodeSource, Guid flowNodeTarget, string comment = null)
+        public FlowLink(DateTime dateTime, decimal amount, string currency, Guid flowNodeSource, Guid flowNodeTarget, Guid exchangeId, string comment = null)
         {
             DateTime = dateTime;
             Amount = amount;
@@ -14,6 +14,7 @@ namespace Model.DbModels
             FlowNodeSource = flowNodeSource;
             FlowNodeTarget = flowNodeTarget;
             Comment = comment;
+            ExchangeId = exchangeId;
             Id = Guid.NewGuid();
         }
         public FlowLink()
@@ -26,5 +27,6 @@ namespace Model.DbModels
         public Guid FlowNodeSource { get; set; }
         public Guid FlowNodeTarget { get; set; }
         public string Comment { get; set; }
+        public Guid ExchangeId { get; set; }
     }
 }
