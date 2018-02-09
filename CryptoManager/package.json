@@ -63,6 +63,7 @@
     "zone.js": "^0.8.0"
   },
   "dependencies": {
+    "chart.js": "^2.7.1",
     "font-awesome": "^4.7.0",
     "font-awesome-webpack": "^0.0.5-beta.2",
     "primeng": "^5.0.2"
