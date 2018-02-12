@@ -7,7 +7,7 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { DropdownModule, ButtonModule, DataTableModule, SharedModule, ConfirmDialogModule, ConfirmationService } from 'primeng/primeng';
+import { DropdownModule, ButtonModule, DataTableModule, SharedModule, ConfirmDialogModule, ConfirmationService, ChartModule } from 'primeng/primeng';
 
 import { NgxGraphModule } from '@swimlane/ngx-graph';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
@@ -23,6 +23,7 @@ import { InvestmentsComponent } from './components/investments/investments.compo
 import { FlowComponent } from './components/flow/flow.component'
 
 import { CryptoApiClient } from './services/api-client';
+import 'chart.js/dist/Chart.min.js';
 
 @NgModule({
     declarations: [
@@ -45,6 +46,7 @@ import { CryptoApiClient } from './services/api-client';
         DataTableModule,
         SharedModule,
         ConfirmDialogModule,
+        ChartModule,
 
         BrowserModule,
         BrowserAnimationsModule,
