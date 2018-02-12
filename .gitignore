@@ -265,3 +265,4 @@ __pycache__/
 crypto.db
 /CryptoManager/crypto.db-journal
 /TestApp
+*.db-journal
