@@ -27,15 +27,13 @@ namespace BackgroundServices
 
             var transactions = _context.Transactions;
             var wallets = new Dictionary<Guid, Dictionary<string, decimal>>();
-            //var fiatInvestments = new Dictionary<Guid, Dictionary<string, decimal>>();
-            //var fiatPayouts = new Dictionary<Guid, Dictionary<string, decimal>>();
-            var fiatDict = new Dictionary<Guid, Dictionary<string, Fiat>>();
+            var fiatDictionaires = new Dictionary<Guid, Dictionary<string, Fiat>>();
 
             foreach (var transaction in transactions)
             {
                 var exchangeWallets = wallets.ContainsKey(transaction.ExchangeId) ? wallets[transaction.ExchangeId] : new Dictionary<string, decimal>();
-                var fiatEx = fiatDict.ContainsKey(transaction.ExchangeId)
-                    ? fiatDict[transaction.ExchangeId]
+                var fiatEx = fiatDictionaires.ContainsKey(transaction.ExchangeId)
+                    ? fiatDictionaires[transaction.ExchangeId]
                     : new Dictionary<string, Fiat>();
 
 
@@ -89,6 +87,7 @@ namespace BackgroundServices
                         // Is this a FiatBalance 
                         if (_marketData.IsFiat(transaction.InCurrency))
                         {
+
                             if (fiatEx.ContainsKey(transaction.InCurrency))
                             {
                                 fiatEx[transaction.InCurrency].Investments += transaction.InAmount;
@@ -130,11 +129,18 @@ namespace BackgroundServices
                         }
 
                         break;
+                    default:
+                        throw new NotImplementedException($"The transaction Type {transaction.Type} is not implemented");
+                        break;
                 }
                 wallets[transaction.ExchangeId] = exchangeWallets;
-                fiatDict[transaction.ExchangeId] = fiatEx;
+                fiatDictionaires[transaction.ExchangeId] = fiatEx;
             }
 
+            // Remove old Data
+            _context.FiatBalances.RemoveRange(_context.FiatBalances);
+            _context.Funds.RemoveRange(_context.Funds);
+            _context.SaveChanges();
 
             // Add funds
             foreach (var wallet in wallets)
@@ -163,35 +169,23 @@ namespace BackgroundServices
             }
 
             // Add Fiat Balances
-            foreach (var fiatDic in fiatDict)
+            foreach (var fiatDic in fiatDictionaires)
             {
-                foreach (var fiatDictValue in fiatDict.Values)
+                foreach (var fiat in fiatDic.Value)
                 {
                     var exchangeId = fiatDic.Key;
-                    foreach (var fiat in fiatDictValue)
-                    {
-                        var currency = fiat.Key;
-                        var investment = fiat.Value.Investments;
-                        var payout = fiat.Value.Payouts;
 
-                        var entity = _context.FiatBalances.SingleOrDefault(f =>
-                            f.ExchangeId == exchangeId && f.Currency == currency);
-                        if (entity == null)
-                        {
-                            _context.FiatBalances.Add(new FiatBalance()
-                            {
-                                Currency = currency,
-                                ExchangeId = exchangeId,
-                                Invested = investment,
-                                Payout = payout
-                            });
-                        }
-                        else
-                        {
-                            entity.Invested = investment;
-                            entity.Payout = payout;
-                        }
-                    }
+                    var currency = fiat.Key;
+                    var investment = fiat.Value.Investments;
+                    var payout = fiat.Value.Payouts;
+                    _context.FiatBalances.Add(new FiatBalance()
+                    {
+                        Currency = currency,
+                        ExchangeId = exchangeId,
+                        Invested = investment,
+                        Payout = payout
+                    });
+
 
                 }
             }
