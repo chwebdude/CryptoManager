@@ -12,9 +12,10 @@ using System;
 namespace Model.Migrations
 {
     [DbContext(typeof(CryptoContext))]
-    partial class CryptoContextModelSnapshot : ModelSnapshot
+    [Migration("20180109223036_AddFlowMeta")]
+    partial class AddFlowMeta
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -81,8 +82,6 @@ namespace Model.Migrations
 
                     b.Property<int>("ExchangeId");
 
-                    b.Property<string>("Passphrase");
-
                     b.Property<string>("PrivateKey");
 
                     b.Property<string>("PublicKey");
@@ -110,14 +109,12 @@ namespace Model.Migrations
                     b.ToTable("FiatBalances");
                 });
 
-            modelBuilder.Entity("Model.DbModels.FlowLink", b =>
+            modelBuilder.Entity("Model.DbModels.Flow", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<decimal>("Amount");
-
-                    b.Property<string>("Comment");
 
                     b.Property<string>("Currency");
 
@@ -125,35 +122,15 @@ namespace Model.Migrations
 
                     b.Property<Guid>("ExchangeId");
 
-                    b.Property<Guid>("FlowNodeSource");
-
-                    b.Property<Guid>("FlowNodeTarget");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("FlowLinks");
-                });
-
-            modelBuilder.Entity("Model.DbModels.FlowNode", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<decimal>("Amount");
-
-                    b.Property<string>("Comment");
-
-                    b.Property<string>("Currency");
-
-                    b.Property<DateTime>("DateTime");
-
-                    b.Property<Guid>("ExchangeId");
+                    b.Property<Guid?>("FlowId");
 
                     b.Property<Guid>("TransactionId");
 
                     b.HasKey("Id");
 
-                    b.ToTable("FlowNodes");
+                    b.HasIndex("FlowId");
+
+                    b.ToTable("Flows");
                 });
 
             modelBuilder.Entity("Model.DbModels.Fund", b =>
@@ -181,6 +158,13 @@ namespace Model.Migrations
                     b.HasKey("Key");
 
                     b.ToTable("Settings");
+                });
+
+            modelBuilder.Entity("Model.DbModels.Flow", b =>
+                {
+                    b.HasOne("Model.DbModels.Flow")
+                        .WithMany("Parents")
+                        .HasForeignKey("FlowId");
                 });
 #pragma warning restore 612, 618
         }

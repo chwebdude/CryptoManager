@@ -15,7 +15,9 @@ namespace Plugins.MarketData
 
         private static readonly MemoryCache Cache = new MemoryCache(new MemoryCacheOptions());
         private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
-        private static Dictionary<string, CoinMeta> CoinCache = new Dictionary<string, CoinMeta>();
+        private static readonly Dictionary<string, CoinMeta> CoinCache = new Dictionary<string, CoinMeta>();
+
+        private static readonly string[] FiatCurrencies = {"EUR", "CHF", "USD"};
 
         #endregion
 
@@ -29,13 +31,10 @@ namespace Plugins.MarketData
                 Exception ex = null;
 
                 // Try 3 times, or return 0
-                for (int i = 0; i < 3; i++)
-                {
+                for (var i = 0; i < 3; i++)
                     try
                     {
-
-
-                        var x = await client.Prices.SingleAsync(currency, new[] { baseCurrency }, true);
+                        var x = await client.Prices.SingleAsync(currency, new[] {baseCurrency}, true);
                         var res = x.First().Value;
                         return res;
                     }
@@ -45,7 +44,7 @@ namespace Plugins.MarketData
                         ex = e;
                         await Task.Delay(5000);
                     }
-                }
+
                 Logger.Error(ex, "Failted to get Historic Market data");
                 return 0;
             });
@@ -58,23 +57,20 @@ namespace Plugins.MarketData
             Exception ex = null;
 
             // Try 3 times, or return a error
-            for (int i = 0; i < 3; i++)
-            {
+            for (var i = 0; i < 3; i++)
                 try
                 {
-                    var x = await client.Prices.HistoricalAsync(currency, new[] { baseCurrency }, time);
+                    var x = await client.Prices.HistoricalAsync(currency, new[] {baseCurrency}, time);
 
                     return x.First().Value.First().Value;
-
                 }
                 catch (Exception e)
                 {
                     Logger.Warn(e);
                     ex = e;
                     await Task.Delay(5000);
-
                 }
-            }
+
             throw new Exception("Failted to get Historic Market data", ex);
         }
 
@@ -85,21 +81,24 @@ namespace Plugins.MarketData
                 var client = new CryptoCompareClient();
                 var data = await client.Coins.ListAsync();
                 foreach (var coin in data.Coins)
-                {
-                    CoinCache.Add(coin.Value.Symbol, new CoinMeta()
+                    CoinCache.Add(coin.Value.Symbol, new CoinMeta
                     {
                         Symbol = coin.Value.Symbol,
                         ImageUrl = data.BaseImageUrl + coin.Value.ImageUrl,
                         Name = coin.Value.CoinName,
                         Url = data.BaseImageUrl + coin.Value.Url
                     });
-                }
             }
 
             if (CoinCache.ContainsKey(symbol))
                 return CoinCache[symbol];
             Logger.Warn("Symbol {0} not present in cache", symbol);
             return null;
+        }
+
+        public bool IsFiat(string symbol)
+        {
+            return FiatCurrencies.Contains(symbol);
         }
 
         #endregion
