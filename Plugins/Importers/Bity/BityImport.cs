@@ -83,7 +83,7 @@ namespace Plugins.Importers.Bity
                     "Trade", outputAmount,
                     outputCurrency,
                     (decimal) fee,
-                    "Unknown Currency",
+                    outputCurrency,
                     inputAmount,
                     inputCurrency,
                     fiatRate
@@ -98,7 +98,7 @@ namespace Plugins.Importers.Bity
                     outputAmount,
                     outputCurrency,
                     (decimal) fee,
-                    "Unknown Currency",
+                    outputCurrency,
                     string.Empty,
                     string.Empty,
                     outputReference
