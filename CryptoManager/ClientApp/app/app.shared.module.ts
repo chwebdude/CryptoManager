@@ -9,6 +9,9 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DropdownModule, ButtonModule, DataTableModule, SharedModule, ConfirmDialogModule, ConfirmationService, ChartModule } from 'primeng/primeng';
 
+import { NgxGraphModule } from '@swimlane/ngx-graph';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
+
 
 import { AppComponent } from './components/app/app.component';
 import { NavMenuComponent } from './components/navmenu/navmenu.component';
@@ -17,6 +20,7 @@ import { ExchangesComponent } from './components/exchanges/exchanges.component';
 import { TransactionsComponent } from './components/transactions/transactions.component';
 import { FundsComponent } from './components/funds/funds.component';
 import { InvestmentsComponent } from './components/investments/investments.component'
+import { FlowComponent } from './components/flow/flow.component'
 
 import { CryptoApiClient } from './services/api-client';
 import 'chart.js/dist/Chart.min.js';
@@ -29,7 +33,8 @@ import 'chart.js/dist/Chart.min.js';
         ExchangesComponent,
         TransactionsComponent,
         FundsComponent,
-        InvestmentsComponent
+        InvestmentsComponent,
+        FlowComponent
     ],
     imports: [
         CommonModule,
@@ -47,6 +52,9 @@ import 'chart.js/dist/Chart.min.js';
         BrowserAnimationsModule,
         HttpClientModule,
 
+        NgxChartsModule,
+        NgxGraphModule,
+
         RouterModule.forRoot([
             { path: '', redirectTo: 'home', pathMatch: 'full' },
             { path: 'home', component: HomeComponent },
@@ -54,6 +62,7 @@ import 'chart.js/dist/Chart.min.js';
             { path: 'funds', component: FundsComponent },
             { path: 'investments', component: InvestmentsComponent },
             { path: 'exchanges', component: ExchangesComponent },
+            { path: 'flow', component: FlowComponent },
             { path: '**', redirectTo: 'home' }
         ])
     ],
