@@ -12,9 +12,10 @@ using System;
 namespace Model.Migrations
 {
     [DbContext(typeof(CryptoContext))]
-    partial class CryptoContextModelSnapshot : ModelSnapshot
+    [Migration("20180208081649_AddTransactionIdToFlowNodes")]
+    partial class AddTransactionIdToFlowNodes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -117,13 +118,9 @@ namespace Model.Migrations
 
                     b.Property<decimal>("Amount");
 
-                    b.Property<string>("Comment");
-
                     b.Property<string>("Currency");
 
                     b.Property<DateTime>("DateTime");
-
-                    b.Property<Guid>("ExchangeId");
 
                     b.Property<Guid>("FlowNodeSource");
 
