@@ -113,12 +113,12 @@ namespace Plugins.Importers.Gdax
         public ExchangeMeta GetExchangeMeta() => new ExchangeMeta()
         {
             Name = "GDAX",
-            ExchangeId = Model.Enums.Exchange.Gdax,
+            ExchangeId = Model.Enums.Exchange.GDAX,
             LabelPrivateKey = "API Secret",
             LabelPublicKey = "API Key",
             LabelPassphrase = "Passphrase"
         };
 
-        public Model.Enums.Exchange Exchange => Model.Enums.Exchange.Gdax;
+        public Model.Enums.Exchange Exchange => Model.Enums.Exchange.GDAX;
     }
 }

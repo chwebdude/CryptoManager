@@ -104,7 +104,7 @@ namespace Plugins.Importers.Coinbase
                     if (await IsCreditcardPayment(transaction.Buy.Payment_Method.Id))
                     {
                         // Add Second transaction for creditcard payment
-                        transactions.Add(CryptoTransaction.NewIn("Creditcard in from buy " + transaction.Buy.User_Reference, transaction.Created_At, exchangeId, transaction.Details.Title + " " + transaction.Details.SubTitle,
+                        transactions.Add(CryptoTransaction.NewIn("Creditcard in from buy " + transaction.Buy.User_Reference, transaction.Created_At.AddSeconds(-2), exchangeId, transaction.Details.Title + " " + transaction.Details.SubTitle,
                             transaction.Buy.Fee.Amount + transaction.Buy.Subtotal.Amount,
                             transaction.Buy.Subtotal.Currency,
                             transaction.Details.Payment_Method_Name,

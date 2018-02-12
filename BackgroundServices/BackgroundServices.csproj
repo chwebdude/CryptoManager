@@ -7,7 +7,7 @@
   <ItemGroup>
     <PackageReference Include="HangFire.Core" Version="1.6.17" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.1" />
-    <PackageReference Include="NLog" Version="4.5.0-rc03" />
+    <PackageReference Include="NLog" Version="4.5.0-rc04" />
   </ItemGroup>
 
   <ItemGroup>
