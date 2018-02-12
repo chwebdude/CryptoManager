@@ -2,23 +2,29 @@
 using System.Collections.Generic;
 using System.Linq;
 using CryptoManager.Models;
+using Hangfire;
+using Microsoft.EntityFrameworkCore;
 using Model.DbModels;
 using Model.Enums;
+using Plugins;
 
 namespace BackgroundServices
 {
     public class Calculator
     {
         private readonly CryptoContext _context;
-        private static readonly string[] FiatCurrencies = { "EUR", "CHF", "USD" };
+        private readonly IMarketData _marketData;
 
-        public Calculator(CryptoContext context)
+        public Calculator(CryptoContext context, IMarketData marketData)
         {
             _context = context;
+            _marketData = marketData;
         }
 
         public void RecalculateAll()
         {
+            BackgroundJob.Enqueue<Calculator>(c => c.CalculateFlow());
+
             var transactions = _context.Transactions;
             var wallets = new Dictionary<Guid, Dictionary<string, decimal>>();
             //var fiatInvestments = new Dictionary<Guid, Dictionary<string, decimal>>();
@@ -32,7 +38,7 @@ namespace BackgroundServices
                     ? fiatDict[transaction.ExchangeId]
                     : new Dictionary<string, Fiat>();
 
-       
+
                 switch (transaction.Type)
                 {
                     case TransactionType.Trade:
@@ -81,7 +87,7 @@ namespace BackgroundServices
                         }
 
                         // Is this a FiatBalance 
-                        if (FiatCurrencies.Contains(transaction.InCurrency))
+                        if (_marketData.IsFiat(transaction.InCurrency))
                         {
                             if (fiatEx.ContainsKey(transaction.InCurrency))
                             {
@@ -91,7 +97,7 @@ namespace BackgroundServices
                             {
                                 fiatEx.Add(transaction.InCurrency, new Fiat
                                 {
-                                   Investments = transaction.InAmount
+                                    Investments = transaction.InAmount
                                 });
                             }
                         }
@@ -108,7 +114,7 @@ namespace BackgroundServices
                         }
 
                         // Is this a FiatBalance 
-                        if (FiatCurrencies.Contains(transaction.OutCurrency))
+                        if (_marketData.IsFiat(transaction.OutCurrency))
                         {
                             if (fiatEx.ContainsKey(transaction.OutCurrency))
                             {
@@ -194,6 +200,192 @@ namespace BackgroundServices
         }
 
 
+        public void CalculateFlow()
+        {
+            // Truncate old data from table
+            _context.FlowNodes.RemoveRange(_context.FlowNodes);
+            _context.FlowLinks.RemoveRange(_context.FlowLinks);
+            _context.SaveChanges();
+
+
+            // Initialize Buckets per Exchange
+            var allNodes = new Dictionary<Guid, IEnumerable<FlowNode>>();
+            var allLinks = new Dictionary<Guid, IEnumerable<FlowLink>>();
+
+            foreach (var exchange in _context.Exchanges)
+            {
+                var links = new List<FlowLink>();
+
+                // Add all Inputs
+                var inputs =
+                    _context.Transactions.Where(t => t.ExchangeId == exchange.Id && t.Type == TransactionType.In).OrderBy(t => t.DateTime);
+                var nodes = inputs.Select(input => new FlowNode(input.DateTime, input.InAmount, input.InCurrency, exchange.Id, input.Id, "In")).ToList();
+
+                // Add all Outputs
+                var outputs = _context.Transactions.Where(t => t.ExchangeId == exchange.Id && t.Type == TransactionType.Out).OrderBy(t => t.DateTime);
+                nodes.AddRange(outputs.Select(output => new FlowNode(output.DateTime, output.OutAmount, output.OutCurrency, exchange.Id, output.Id, "Out")));
+
+                var transactions = _context.Transactions.Where(t => t.ExchangeId == exchange.Id).OrderBy(t => t.DateTime);
+
+                var lastBuckets = new Dictionary<string, Guid>(); // Currency/FlowNode Id
+
+                foreach (var transaction in transactions)
+                {
+                    switch (transaction.Type)
+                    {
+                        case TransactionType.In:
+                            {
+                                if (lastBuckets.ContainsKey(transaction.InCurrency))
+                                {
+                                    // Add Amount to new Bucket
+                                    var sourceNode = nodes.Single(n => n.DateTime == transaction.DateTime && n.Amount == transaction.InAmount);
+
+                                    var oldNode = nodes.Single(n => n.Id == lastBuckets[transaction.InCurrency]);
+                                    var newNode = new FlowNode(transaction.DateTime, transaction.InAmount + oldNode.Amount, transaction.InCurrency, exchange.Id, Guid.Empty);
+                                    nodes.Add(newNode);
+                                    var link1 = new FlowLink(transaction.DateTime, oldNode.Amount, transaction.InCurrency, oldNode.Id, newNode.Id, exchange.Id);
+                                    var link2 = new FlowLink(transaction.DateTime, transaction.InAmount, transaction.InCurrency, sourceNode.Id, newNode.Id, exchange.Id, "In");
+                                    links.Add(link1);
+                                    links.Add(link2);
+                                    lastBuckets[transaction.InCurrency] = newNode.Id;
+
+                                }
+                                else
+                                {
+                                    var sourceNode = nodes.Single(n => n.TransactionId == transaction.Id);
+                                    var node = new FlowNode(transaction.DateTime, transaction.InAmount, transaction.InCurrency, exchange.Id, transaction.Id);
+                                    nodes.Add(node);
+
+                                    var link = new FlowLink(transaction.DateTime, transaction.InAmount, transaction.InCurrency, sourceNode.Id, node.Id, exchange.Id, "In");
+                                    links.Add(link);
+                                    lastBuckets.Add(transaction.InCurrency, node.Id);
+                                }
+                            }
+
+                            break;
+
+                        case TransactionType.Trade:
+                            if (lastBuckets.ContainsKey(transaction.BuyCurrency))
+                            {
+                                // Buy Bucket already exists
+                                var buyBucketNode = nodes.Single(n => n.Id == lastBuckets[transaction.BuyCurrency]);
+                                var prevNode = nodes.Single(n => n.Id == lastBuckets[transaction.SellCurrency]);
+                                var restNode = new FlowNode(transaction.DateTime, prevNode.Amount - transaction.SellAmount, transaction.SellCurrency, exchange.Id, transaction.Id);
+                                var newBuyBucketNode = new FlowNode(transaction.DateTime, buyBucketNode.Amount + transaction.BuyAmount, buyBucketNode.Currency, exchange.Id, transaction.Id);
+
+                                // Calculate fee
+                                if (transaction.FeeCurrency == prevNode.Currency)
+                                {
+                                    restNode.Amount -= transaction.FeeAmount;
+                                }
+                                else if (transaction.FeeCurrency == newBuyBucketNode.Currency)
+                                {
+                                    newBuyBucketNode.Amount -= transaction.FeeAmount;
+                                }
+                                else
+                                {
+                                    throw new NotImplementedException("Transaction Fee could not be added");
+                                }
+
+                                var linkToNewBuyBucket = new FlowLink(transaction.DateTime, transaction.BuyAmount, transaction.BuyCurrency, prevNode.Id, newBuyBucketNode.Id, exchange.Id, $"Trade {Math.Round(transaction.BuyAmount, 2)} {transaction.BuyCurrency} for {Math.Round(transaction.SellAmount, 2)} {transaction.SellCurrency}");
+                                var linkToNewBucket = new FlowLink(transaction.DateTime, buyBucketNode.Amount, buyBucketNode.Currency, buyBucketNode.Id, newBuyBucketNode.Id, exchange.Id);
+                                var linkToNewRestBucket = new FlowLink(transaction.DateTime, prevNode.Amount - transaction.SellAmount, transaction.SellCurrency, prevNode.Id, restNode.Id, exchange.Id);
+
+                                // Add data
+                                nodes.Add(restNode);
+                                nodes.Add(newBuyBucketNode);
+                                links.Add(linkToNewBuyBucket);
+                                links.Add(linkToNewBucket);
+                                links.Add(linkToNewRestBucket);
+
+                                // Set new Buckets
+                                lastBuckets[transaction.BuyCurrency] = newBuyBucketNode.Id;
+                                lastBuckets[transaction.SellCurrency] = restNode.Id;
+                            }
+                            else
+                            {
+                                // Create new Buy Bucket
+                                var prevNode = nodes.Single(n => n.Id == lastBuckets[transaction.SellCurrency]);
+                                var buyNode = new FlowNode(transaction.DateTime, transaction.BuyAmount, transaction.BuyCurrency, exchange.Id, transaction.Id);
+                                var sellAndRestNode = new FlowNode(transaction.DateTime, prevNode.Amount - transaction.SellAmount, transaction.SellCurrency, exchange.Id, transaction.Id);
+
+                                // Calculate fee
+                                if (transaction.FeeCurrency == prevNode.Currency)
+                                {
+                                    sellAndRestNode.Amount -= transaction.FeeAmount;
+                                }
+                                else if (transaction.FeeCurrency == buyNode.Currency)
+                                {
+                                    buyNode.Amount -= transaction.FeeAmount;
+                                }
+                                else
+                                {
+                                    throw new NotImplementedException("Transaction Fee could not be added");
+                                }
+
+
+                                // Add Links
+                                var buyLink = new FlowLink(transaction.DateTime, transaction.BuyAmount, transaction.BuyCurrency, prevNode.Id, buyNode.Id, exchange.Id, $"Trade {Math.Round(transaction.BuyAmount, 2)} {transaction.BuyCurrency} for {Math.Round(transaction.SellAmount, 2)} {transaction.SellCurrency}");
+                                var sellAndRestLink = new FlowLink(transaction.DateTime, prevNode.Amount - transaction.SellAmount, transaction.SellCurrency, prevNode.Id, sellAndRestNode.Id, exchange.Id);
+
+                                // Add to Dictionaries
+                                links.Add(buyLink);
+                                links.Add(sellAndRestLink);
+                                nodes.Add(buyNode);
+                                nodes.Add(sellAndRestNode);
+
+                                // Set new Buckets
+                                lastBuckets[transaction.BuyCurrency] = buyNode.Id;
+                                lastBuckets[transaction.SellCurrency] = sellAndRestNode.Id;
+                            }
+                            break;
+
+                        case TransactionType.Out:
+                            var previousNode = nodes.Single(n => n.Id == lastBuckets[transaction.OutCurrency]);
+
+                            var outNode = nodes.Single(n => n.TransactionId == transaction.Id);
+                            var nextNode = new FlowNode(transaction.DateTime, previousNode.Amount - outNode.Amount, transaction.OutCurrency, exchange.Id, Guid.Empty);
+                            nodes.Add(nextNode);
+
+                            var linkPreviousOut = new FlowLink(transaction.DateTime, transaction.OutAmount, transaction.OutCurrency, previousNode.Id, outNode.Id, exchange.Id, "Out");
+                            var linkPreviousNext = new FlowLink(transaction.DateTime, nextNode.Amount, transaction.OutCurrency, previousNode.Id, nextNode.Id, exchange.Id);
+                            links.Add(linkPreviousOut);
+                            links.Add(linkPreviousNext);
+                            lastBuckets[transaction.OutCurrency] = nextNode.Id;
+
+                            break;
+
+                        default:
+                            throw new ArgumentException($"Transaction Type {transaction.Type} is unknown");
+                    }
+                }
+
+
+                allNodes.Add(exchange.Id, nodes);
+                allLinks.Add(exchange.Id, links);
+            }
+
+
+
+            // Save Data
+            foreach (var allNode in allNodes)
+            {
+                foreach (var nodes in allNode.Value)
+                {
+                    _context.FlowNodes.Add(nodes);
+                }
+            }
+            foreach (var allLink in allLinks)
+            {
+                foreach (var link in allLink.Value)
+                {
+                    _context.FlowLinks.Add(link);
+                }
+            }
+
+            _context.SaveChanges();
+        }
+
         class Fiat
         {
             public decimal Investments { get; set; }
@@ -202,3 +394,6 @@ namespace BackgroundServices
 
     }
 }
+
+
+

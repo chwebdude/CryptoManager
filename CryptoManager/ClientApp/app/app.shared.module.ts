@@ -7,7 +7,10 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { DropdownModule, ButtonModule, DataTableModule, SharedModule, ConfirmDialogModule, ConfirmationService } from 'primeng/primeng';
+import { DropdownModule, ButtonModule, DataTableModule, SharedModule, ConfirmDialogModule, ConfirmationService, ChartModule } from 'primeng/primeng';
+
+import { NgxGraphModule } from '@swimlane/ngx-graph';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
 
 
 import { AppComponent } from './components/app/app.component';
@@ -17,49 +20,57 @@ import { ExchangesComponent } from './components/exchanges/exchanges.component';
 import { TransactionsComponent } from './components/transactions/transactions.component';
 import { FundsComponent } from './components/funds/funds.component';
 import { InvestmentsComponent } from './components/investments/investments.component'
+import { FlowComponent } from './components/flow/flow.component'
 
 import { CryptoApiClient } from './services/api-client';
+import 'chart.js/dist/Chart.min.js';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    NavMenuComponent,
-    HomeComponent,
-    ExchangesComponent,
-    TransactionsComponent,
-    FundsComponent,
-    InvestmentsComponent
-  ],
-  imports: [
-    CommonModule,
-    HttpModule,
-    FormsModule,
+    declarations: [
+        AppComponent,
+        NavMenuComponent,
+        HomeComponent,
+        ExchangesComponent,
+        TransactionsComponent,
+        FundsComponent,
+        InvestmentsComponent,
+        FlowComponent
+    ],
+    imports: [
+        CommonModule,
+        HttpModule,
+        FormsModule,
 
-    DropdownModule,
-    ButtonModule,
-    DataTableModule,
-    SharedModule,
-    ConfirmDialogModule,
+        DropdownModule,
+        ButtonModule,
+        DataTableModule,
+        SharedModule,
+        ConfirmDialogModule,
+        ChartModule,
 
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
+        BrowserModule,
+        BrowserAnimationsModule,
+        HttpClientModule,
 
-    RouterModule.forRoot([
-      { path: '', redirectTo: 'home', pathMatch: 'full' },
-      { path: 'home', component: HomeComponent },
-      { path: 'transactions', component: TransactionsComponent },
-      { path: 'funds', component: FundsComponent },
-      { path: 'investments', component: InvestmentsComponent },
-      { path: 'exchanges', component: ExchangesComponent },
-      { path: '**', redirectTo: 'home' }
-    ])
-  ],
-  providers: [
-    CryptoApiClient,
+        NgxChartsModule,
+        NgxGraphModule,
 
-    ConfirmationService
-  ]
+        RouterModule.forRoot([
+            { path: '', redirectTo: 'home', pathMatch: 'full' },
+            { path: 'home', component: HomeComponent },
+            { path: 'transactions', component: TransactionsComponent },
+            { path: 'funds', component: FundsComponent },
+            { path: 'investments', component: InvestmentsComponent },
+            { path: 'exchanges', component: ExchangesComponent },
+            { path: 'flow', component: FlowComponent },
+            { path: '**', redirectTo: 'home' }
+        ])
+    ],
+    providers: [
+        CryptoApiClient,
+
+        ConfirmationService
+    ]
 })
 export class AppModuleShared {
 }

@@ -20,6 +20,8 @@
     "@angular/router": "^5.0.0",
     "@ngtools/webpack": "^1.0.0",
     "@types/chai": "^4.0.0",
+    "@types/d3": "^4.12.0",
+    "@types/d3-shape": "^1.2.2",
     "@types/jasmine": "^2.0.0",
     "@types/webpack-env": "^1.0.0",
     "angular2-router-loader": "0.3.5",
@@ -63,6 +65,8 @@
     "zone.js": "^0.8.0"
   },
   "dependencies": {
+    "@swimlane/ngx-graph": "^4.0.2",
+    "chart.js": "^2.7.1",
     "font-awesome": "^4.7.0",
     "font-awesome-webpack": "^0.0.5-beta.2",
     "primeng": "^5.0.2"
