@@ -66,6 +66,7 @@
   },
   "dependencies": {
     "@swimlane/ngx-graph": "^4.0.2",
+    "chart.js": "^2.7.1",
     "font-awesome": "^4.7.0",
     "font-awesome-webpack": "^0.0.5-beta.2",
     "primeng": "^5.0.2"
