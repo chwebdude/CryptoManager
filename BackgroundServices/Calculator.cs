@@ -278,7 +278,12 @@ namespace BackgroundServices
                                 }
                                 else
                                 {
-                                    throw new NotImplementedException("Transaction Fee could not be added");
+                                    // Fee is in a another currency -> Create output of the bucket
+                                    var feeBucket = nodes.Single(n => n.Id == lastBuckets[transaction.FeeCurrency]);
+                                    var feeOutputNode = new FlowNode(transaction.DateTime, transaction.FeeAmount, transaction.FeeCurrency, exchange.Id, transaction.Id, "Fee Out");
+                                    var feeOutputLink = new FlowLink(transaction.DateTime, transaction.FeeAmount, transaction.FeeCurrency, feeBucket.Id, feeOutputNode.Id, exchange.Id, $"Fee of {transaction.FeeAmount} {transaction.FeeCurrency}");
+                                    nodes.Add(feeOutputNode);
+                                    links.Add(feeOutputLink);                                    
                                 }
 
                                 var linkToNewBuyBucket = new FlowLink(transaction.DateTime, transaction.BuyAmount, transaction.BuyCurrency, prevNode.Id, newBuyBucketNode.Id, exchange.Id, $"Trade {Math.Round(transaction.BuyAmount, 2)} {transaction.BuyCurrency} for {Math.Round(transaction.SellAmount, 2)} {transaction.SellCurrency}");
@@ -314,7 +319,12 @@ namespace BackgroundServices
                                 }
                                 else
                                 {
-                                    throw new NotImplementedException("Transaction Fee could not be added");
+                                    // Fee is in a another currency -> Create output of the bucket
+                                    var feeBucket = nodes.Single(n => n.Id == lastBuckets[transaction.FeeCurrency]);
+                                    var feeOutputNode = new FlowNode(transaction.DateTime, transaction.FeeAmount, transaction.FeeCurrency, exchange.Id, transaction.Id, "Fee Out");
+                                    var feeOutputLink = new FlowLink(transaction.DateTime, transaction.FeeAmount, transaction.FeeCurrency, feeBucket.Id, feeOutputNode.Id, exchange.Id, $"Fee of {transaction.FeeAmount} {transaction.FeeCurrency}");
+                                    nodes.Add(feeOutputNode);
+                                    links.Add(feeOutputLink);                                    
                                 }
 
 
