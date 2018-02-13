@@ -69,6 +69,9 @@ namespace Plugins.Importers.Kraken
             {
                 assetsCache.Add(assetInfo.Key, assetInfo.Value.Altname);
             }
+
+            // Overrides
+            assetsCache["XXBT"] = "BTC";
         }
 
         public ExchangeMeta GetExchangeMeta() => new ExchangeMeta()
