@@ -5,17 +5,18 @@ A Cryptocurrency Manager
 |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	|---------------------------------------------------------------------------------------------------------------------------------------------------	|
 | [![Build status](https://ci.appveyor.com/api/projects/status/j63d7v4wdi4yi0o9/branch/master?svg=true)](https://ci.appveyor.com/project/chwebdude/cryptomanager/branch/master) 	![Build status](https://webdude.visualstudio.com/_apis/public/build/definitions/4959fc14-70a5-4e9b-b324-aa9246ec93a1/16/badge)| [![Build status](https://ci.appveyor.com/api/projects/status/j63d7v4wdi4yi0o9?svg=true)](https://ci.appveyor.com/project/chwebdude/cryptomanager) 	|
 
+## [Download Latest Release](https://github.com/chwebdude/CryptoManager/releases/latest)
 
 This is a simple tool to import your crypto transactions and trades and show your profit and much more. It runns on your own computer. So you don't have to provide your credentials to any third party. Everything stays on your disk!
 The tool itself is based on .Net Core. So it's plattform independent :blush:
 
 # Table of Content
-- [CryptoManager](#cryptomanager)
-- [Table of Content](#table-of-content)
 - [Usage](#usage)
     - [First Start](#first-start)
 - [Development](#development)
     - [Dependencies](#dependencies)
+    - [Technology Sack](#technology-sack)
+    - [Licence](#licence)
 
 # Usage
 Download your Windows or Mac OS X Package from the release section.
@@ -25,9 +26,19 @@ First you mast define your Importers. Click on **Exchanges**. Then you can add y
 
 
 # Development
-I would be happy to see some help from other developers. Just create a fork and push it back to this repository. Otherwise create Issue with your Bug/Idea.
+I would be happy to see some help from other developers. Just create a fork and push it back to this repository. Otherwise create Issue with your Bug/Idea. Use the latest version of Visual Studio 2017.
 ## Dependencies
 - .net Core SDK
 - NodeJS + Yarn Package Manager
+## Technology Sack
+- .net Core 2
+- ASP.NET Core
+- Entity Framework Core
+- SQLite
+- NLOG
+- Angular 5
+- Bootsrap & PrimeNG
 
-To start your development execute ```yarn``` in the ```CryptoManager``` directory.
+To start your development execute ```yarn``` in the ```CryptoManager``` directory. After that Webpack builds the frontend together and serves it wih .net Core.
+
+## [Licence](https://github.com/chwebdude/CryptoManager/blob/master/LICENSE)
