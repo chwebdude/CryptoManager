@@ -20,7 +20,7 @@ namespace Plugins.Importers.Gdax
             _marketData = marketData;
         }
 
-        public async Task<IEnumerable<CryptoTransaction>> GetTransactions(Exchange exchange)
+        public async Task<IEnumerable<CryptoTransaction>> GetTransactionsAsync(Exchange exchange)
         {
             var authenticator = new Authenticator(exchange.PublicKey, exchange.PrivateKey, exchange.Passphrase);
             var client = new GDAXClient.GDAXClient(authenticator);

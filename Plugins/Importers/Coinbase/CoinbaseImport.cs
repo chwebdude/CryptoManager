@@ -25,7 +25,7 @@ namespace Plugins.Importers.Coinbase
 
         private IMarketData _marketData;
 
-        public async Task<IEnumerable<CryptoTransaction>> GetTransactions(Exchange exchange)
+        public async Task<IEnumerable<CryptoTransaction>> GetTransactionsAsync(Exchange exchange)
         {
             _apiKey = exchange.PublicKey;
             _apiSecret = exchange.PrivateKey;

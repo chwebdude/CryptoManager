@@ -25,7 +25,7 @@ namespace BackgroundServices
         {
             var exchange = _context.Exchanges.Find(exchangeId);
             var importer = GetImporter(exchange.ExchangeId);
-            var transactions = await importer.GetTransactions(exchange);
+            var transactions = await importer.GetTransactionsAsync(exchange);
 
             foreach (var transaction in transactions)
             {

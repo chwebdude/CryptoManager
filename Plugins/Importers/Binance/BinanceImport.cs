@@ -23,7 +23,7 @@ namespace Plugins.Importers.Binance
         }
 
 
-        public async Task<IEnumerable<CryptoTransaction>> GetTransactions(Exchange exchange)
+        public async Task<IEnumerable<CryptoTransaction>> GetTransactionsAsync(Exchange exchange)
         {
             var client = new BinanceClient(exchange.PublicKey, exchange.PrivateKey);
             var trades = new List<CryptoTransaction>();
