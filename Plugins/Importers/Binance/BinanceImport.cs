@@ -19,11 +19,11 @@ namespace Plugins.Importers.Binance
 
         public BinanceImport(IMarketData marketData)
         {
-            this._marketData = marketData;
+            _marketData = marketData;
         }
 
 
-        public async Task<IEnumerable<CryptoTransaction>> GetTransactions(Exchange exchange)
+        public async Task<IEnumerable<CryptoTransaction>> GetTransactionsAsync(Exchange exchange)
         {
             var client = new BinanceClient(exchange.PublicKey, exchange.PrivateKey);
             var trades = new List<CryptoTransaction>();
@@ -121,13 +121,19 @@ namespace Plugins.Importers.Binance
                 // Rename Bitcoin cash
                 if (currency2 == "BCC")
                     currency2 = "BCH";
+                if (currency1 == "BCC")
+                    currency1 = "BCH";
 
                 var binanceApiResult = await client.GetMyTradesAsync(symbol);
                 if (binanceApiResult.Success)
-                {
-
+                {                    
                     foreach (var trade in binanceApiResult.Data)
                     {
+                        // Rename Bitcoin cash
+                        if (trade.CommissionAsset == "BCC")
+                            trade.CommissionAsset = "BCH";
+
+
                         if (trade.IsBuyer)
                         {
                             // Buy

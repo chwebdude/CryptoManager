@@ -23,7 +23,7 @@ namespace Plugins.Importers.Bity
             _marketData = marketData;
         }
 
-        public async Task<IEnumerable<CryptoTransaction>> GetTransactions(Exchange exchange)
+        public async Task<IEnumerable<CryptoTransaction>> GetTransactionsAsync(Exchange exchange)
         {
             var client = new RestClient("https://bity.com/");
 

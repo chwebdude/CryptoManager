@@ -22,7 +22,7 @@ namespace Plugins.Importers.Blockchain
             _marketData = marketData;
         }
 
-        public async Task<IEnumerable<CryptoTransaction>> GetTransactions(Exchange exchange)
+        public async Task<IEnumerable<CryptoTransaction>> GetTransactionsAsync(Exchange exchange)
         {
             var list = new List<CryptoTransaction>();
 

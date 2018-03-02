@@ -9,7 +9,7 @@ namespace Plugins
 {
     public interface IImporter
     {                
-        Task<IEnumerable<CryptoTransaction>> GetTransactions(Exchange exchange);
+        Task<IEnumerable<CryptoTransaction>> GetTransactionsAsync(Exchange exchange);
         ExchangeMeta GetExchangeMeta();
         Model.Enums.Exchange Exchange { get; }
     }

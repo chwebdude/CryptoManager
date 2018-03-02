@@ -10,6 +10,7 @@ namespace Model.Enums
         Binance = 2,
         Blockchain = 3,
         GDAX = 4,
-        Bity = 5
+        Bity = 5,
+        Kraken = 6
     }
 }
