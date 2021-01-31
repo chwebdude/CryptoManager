@@ -1,0 +1,58 @@
+<nav class="navbar bg-light">
+
+
+
+  <!-- Links -->
+  <ul class="navbar-nav">
+    <a class="navbar-brand" [routerLink]="['/home']">Crypto Manager</a>
+
+    <li class="nav-item" [routerLinkActive]="['link-active']">
+      <a class="nav-link" [routerLink]="['/home']">
+        <fa-icon [icon]="faHome"></fa-icon> Home
+      </a>
+    </li>
+
+    <li class="nav-item" [routerLinkActive]="['link-active']">
+      <a class="nav-link" [routerLink]="['/transactions']">
+        <fa-icon [icon]="faList"></fa-icon> Transactions
+      </a>
+    </li>
+
+    <li class="nav-item" [routerLinkActive]="['link-active']">
+      <a class="nav-link" [routerLink]="['/funds']">
+        <fa-icon [icon]="faMoneyBillAlt"></fa-icon> Funds
+      </a>
+    </li>
+
+    <li class="nav-item" [routerLinkActive]="['link-active']">
+      <a class="nav-link" [routerLink]="['/investments']">
+        <fa-icon [icon]="faChartBar"></fa-icon> Investments
+      </a>
+    </li>
+
+    <li class="nav-item" [routerLinkActive]="['link-active']">
+      <a class="nav-link" [routerLink]="['/exchanges']">
+        <fa-icon [icon]="faExchangeAlt"></fa-icon> Exchanges
+      </a>
+    </li>
+
+    <li class="nav-item" [routerLinkActive]="['link-active']">
+      <a class="nav-link" [routerLink]="['/flow']">
+        <fa-icon [icon]="faRandom"></fa-icon> Flow
+      </a>
+    </li>
+
+    <li>
+      <span *ngIf="backgroundTasks > 1" class="badge">{{backgroundTasks}} Background tasks running</span>
+      <span *ngIf="backgroundTasks == 1" class="badge">{{backgroundTasks}} Background task running</span>
+    </li>
+
+    <li *ngIf="updateRelease != null">
+      <button type="button" class="btn btn-danger" (click)="openGithubRelease()">
+        New Version available: <span class="badge badge-light">{{updateRelease.name}}</span>
+      </button>
+
+    </li>
+  </ul>
+
+</nav>
