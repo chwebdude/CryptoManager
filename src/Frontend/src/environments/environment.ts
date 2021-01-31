@@ -5,7 +5,8 @@
 export const environment = {
   production: false,
   version: '#{GitVersion_SemVer}#',
-  apiBaseUrl: 'https://localhost:5001'
+  apiBaseUrl: 'https://localhost:5001',
+  backgroundProcessCheckInterval: 1000
 };
 
 /*

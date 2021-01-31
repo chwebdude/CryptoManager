@@ -4,7 +4,7 @@ import { Observable } from "rxjs";
 import { interval } from "rxjs";
 import { CryptoApiClient } from '../services/api-client.service';
 import { environment } from '../../environments/environment';
-import {faHome, faList, faMoneyBillAlt, faChartBar, faExchangeAlt, faRandom  } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faList, faMoneyBillAlt, faChartBar, faExchangeAlt, faRandom, faSync } from '@fortawesome/free-solid-svg-icons';
 
 
 
@@ -16,6 +16,7 @@ import {faHome, faList, faMoneyBillAlt, faChartBar, faExchangeAlt, faRandom  } f
 export class NavMenuComponent {
   httpParams: string;
   backgroundTasks: number;
+  backgroundTasksRetries: number;
   updateRelease: LatestRelease;
 
   faHome = faHome;
@@ -24,8 +25,9 @@ export class NavMenuComponent {
   faChartBar = faChartBar;
   faExchangeAlt = faExchangeAlt;
   faRandom = faRandom;
+  faSync = faSync;
 
-  constructor( private http: HttpClient, private client: CryptoApiClient) { }
+  constructor(private http: HttpClient, private client: CryptoApiClient) { }
 
 
   ngOnInit() {
@@ -37,18 +39,19 @@ export class NavMenuComponent {
     this.httpParams = httpParams.toString();
 
 
-    interval(1000).subscribe(() => {
-        this.getHangfireStats()
-          .subscribe(data => {
-            this.backgroundTasks = data["processing:count"].value;
-          });
-      });
+    interval(environment.backgroundProcessCheckInterval).subscribe(() => {
+      this.getHangfireStats()
+        .subscribe(data => {
+          this.backgroundTasks = data["processing:count"].value + data["enqueued:count-or-null"].value;
+          this.backgroundTasksRetries = data["retries:count"].value;
+        });
+    });
 
-    // // Check every 10 Minutes
-    // IntervalObservable.create(600000)
-    //   .subscribe(() => {
-    //     this.getLatestRelease();
-    //   });
+    // Check every 10 Minutes
+    interval(600000)
+      .subscribe(() => {
+        this.getLatestRelease();
+      });
 
     var lastCheck = localStorage.getItem("lastUpdateCheck");
     if (lastCheck == null || parseInt(lastCheck) < Date.now() - 600000) {
@@ -57,16 +60,16 @@ export class NavMenuComponent {
   }
 
   getHangfireStats(): Observable<HangfireStats> {
-    return this.http.post<HangfireStats>(environment.apiBaseUrl + "/hangfire/stats",
-      this.httpParams,
-      {
-        headers: new HttpHeaders()
-          .set('Content-Type', 'application/x-www-form-urlencoded')
-      });
+    var metrics = new FormData();
+    metrics.append("metrics[]", "retries:count");
+    metrics.append("metrics[]", "enqueued:count-or-null");
+    metrics.append("metrics[]", "processing:count");
+
+    return this.http.post<HangfireStats>(environment.apiBaseUrl + "/hangfire/stats", metrics);
   }
 
   recalculate(): void {
-    // this.client.apiTransactionsRecalculatePost().subscribe();
+    this.client.recalculate().subscribe();
   }
 
   getLatestRelease(): void {
@@ -96,7 +99,7 @@ class HangfireMetric {
 class HangfireStats {
   'enqueued:count-or-null': HangfireMetric;
   'processing:count': HangfireMetric;
-  'succeeded:count': HangfireMetric;
+  'retries:count': HangfireMetric;
 }
 
 class LatestRelease {

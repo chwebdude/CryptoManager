@@ -5,6 +5,7 @@ using CryptoManager.Models;
 using Hangfire;
 using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -40,8 +41,14 @@ namespace CryptoManager.App
             var connectionString = "Data Source = '" + CryptoContext.DatabaseFile + "'";
             services.AddDbContext<CryptoContext>(options => options.UseSqlite(connectionString));
 
+            services.AddCors(options =>
+                options.AddPolicy("AllowAny",
+                    builder => builder.AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowAnyOrigin()));
+
             services.AddControllers();
-            
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "CryptoManager", Version = "v1" });
@@ -60,6 +67,7 @@ namespace CryptoManager.App
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "App v1"));
+                app.UseCors("AllowAny");
             }
 
             try

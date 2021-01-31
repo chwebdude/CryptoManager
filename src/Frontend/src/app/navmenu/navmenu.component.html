@@ -43,8 +43,16 @@
     </li>
 
     <li>
-      <span *ngIf="backgroundTasks > 1" class="badge">{{backgroundTasks}} Background tasks running</span>
-      <span *ngIf="backgroundTasks == 1" class="badge">{{backgroundTasks}} Background task running</span>
+      <a (click)="recalculate()" href="javascript: void(0)">
+        <fa-icon [icon]="faSync"></fa-icon> Recalculate
+      </a>
+    </li>
+
+    <li>
+      <span *ngIf="backgroundTasks > 1" class="badge badge-secondary">{{backgroundTasks}} Background tasks running</span>
+      <span *ngIf="backgroundTasks == 1" class="badge badge-secondary">{{backgroundTasks}} Background task running</span>
+      <span *ngIf="backgroundTasksRetries > 1" class="badge badge-warning">{{backgroundTasksRetries}} Background tasks failed</span>
+      <span *ngIf="backgroundTasksRetries == 1" class="badge badge-warning">{{backgroundTasksRetries}} Background task failed</span>
     </li>
 
     <li *ngIf="updateRelease != null">
