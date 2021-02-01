@@ -53,7 +53,7 @@ namespace CryptoManager.App.Controllers
         [HttpGet]
         public IEnumerable<ExchangeDTO> Get()
         {
-            var data = _cryptoContext.Exchanges.OrderByDescending(e => e.ExchangeId.ToString());
+            var data = _cryptoContext.Exchanges.OrderByDescending(e => e.ExchangeId.ToString()).AsEnumerable();
             var res = _mapper.Map<IEnumerable<ExchangeDTO>>(data);
             return res;
         }

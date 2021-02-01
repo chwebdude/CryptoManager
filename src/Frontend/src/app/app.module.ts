@@ -10,6 +10,17 @@ import { HttpClientModule } from '@angular/common/http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { environment } from 'src/environments/environment';
+import { ExchangesComponent } from './exchanges/exchanges.component';
+import { FundsComponent } from './funds/funds.component';
+import { FlowComponent } from './flow/flow.component';
+import { TransactionsComponent } from './transactions/transactions.component';
+import { DropdownModule } from 'primeng/dropdown';
+import {ConfirmDialogModule} from 'primeng/confirmdialog';
+import { FormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {FieldsetModule} from 'primeng/fieldset';
+import {InputTextModule} from 'primeng/inputtext';
+import {ButtonModule} from 'primeng/button';
 
 
 
@@ -17,15 +28,25 @@ import { environment } from 'src/environments/environment';
   declarations: [
     AppComponent,
     NavMenuComponent,
-    HomeComponent
+    HomeComponent,
+    ExchangesComponent,
+    FundsComponent,
+    FlowComponent,
+    TransactionsComponent
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     AppRoutingModule,
     HttpClientModule,
     NgbModule,
-    FontAwesomeModule
-
+    FontAwesomeModule,
+    FormsModule,
+    DropdownModule,
+    ConfirmDialogModule,
+    FieldsetModule,
+    InputTextModule,
+    ButtonModule
     
   ],
   providers: [

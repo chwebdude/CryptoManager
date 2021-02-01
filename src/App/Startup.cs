@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using AutoMapper;
 using BackgroundServices;
 using CryptoManager.Models;
 using Hangfire;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using NLog;
+using Plugins;
 
 namespace CryptoManager.App
 {
@@ -47,6 +49,7 @@ namespace CryptoManager.App
                     .AllowAnyMethod()
                     .AllowAnyOrigin()));
 
+            services.AddAutoMapper(typeof(MappingProfile));
             services.AddControllers();
 
             services.AddSwaggerGen(c =>
@@ -57,6 +60,8 @@ namespace CryptoManager.App
             //services.AddAut
 
             services.AddHangfire(Configuration => Configuration.UseMemoryStorage());
+
+            services.AddSingleton<IMarketData>(new Plugins.MarketData.CryptoCompare());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
